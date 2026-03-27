@@ -1,0 +1,23 @@
+.clue-list {
+  overflow-y: auto;
+  flex: 1;
+  background: #fff;
+  direction: rtl;
+}
+
+.clue-section {
+  margin-bottom: 8px;
+}
+
+.clue-section-title {
+  background: #e8f0f8;
+  color: #2c5f8a;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-bottom: 1px solid #c8ddf0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}

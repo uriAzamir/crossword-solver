@@ -1,0 +1,70 @@
+.solver-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: #f5f8fc;
+}
+
+.hidden-input {
+  position: fixed;
+  top: -100px;
+  left: -100px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.solver-topbar {
+  display: flex;
+  align-items: stretch;
+  background: #f0f7ff;
+  border-bottom: 2px solid #5b9bd5;
+  flex-shrink: 0;
+}
+
+.solver-topbar .clue-display {
+  flex: 1;
+  border-bottom: none;
+}
+
+.new-puzzle-btn {
+  background: transparent;
+  border: none;
+  border-right: 1px solid #c8ddf0;
+  color: #5a7d9a;
+  font-size: 1.1rem;
+  padding: 0 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.new-puzzle-btn:active {
+  background: #e0edf8;
+}
+
+.solver-grid-area {
+  padding: 12px;
+  background: #fff;
+  border-bottom: 2px solid #dde8f4;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.solver-grid-area .crossword-grid {
+  max-width: 380px;
+  width: 100%;
+}
+
+.solver-clues-area {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.solver-clues-area .clue-list {
+  flex: 1;
+}

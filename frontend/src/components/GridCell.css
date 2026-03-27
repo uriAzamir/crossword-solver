@@ -1,0 +1,55 @@
+.grid-cell {
+  position: relative;
+  border: 1px solid #333;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  aspect-ratio: 1;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.grid-cell.blocked {
+  background: #1a1a1a;
+  cursor: default;
+  border-color: #1a1a1a;
+}
+
+.grid-cell.highlight-word {
+  background: #cce5ff;
+}
+
+.grid-cell.highlight-active {
+  background: #5b9bd5;
+}
+
+.cell-number {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font-size: 0.5em;
+  line-height: 1;
+  color: #333;
+  font-family: Arial, sans-serif;
+  pointer-events: none;
+}
+
+.grid-cell.highlight-active .cell-number {
+  color: #fff;
+}
+
+.cell-letter {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: #111;
+  font-family: 'Frank Ruhl Libre', serif;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.grid-cell.highlight-active .cell-letter {
+  color: #fff;
+}

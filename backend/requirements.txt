@@ -1,0 +1,8 @@
+flask
+flask-cors
+opencv-python
+anthropic
+python-dotenv
+pytesseract
+Pillow
+numpy

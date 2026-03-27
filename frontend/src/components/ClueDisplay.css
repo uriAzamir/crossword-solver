@@ -1,0 +1,41 @@
+.clue-display {
+  background: #f0f7ff;
+  border-bottom: 2px solid #5b9bd5;
+  padding: 10px 14px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  direction: rtl;
+  flex-shrink: 0;
+}
+
+.clue-display--empty {
+  color: #888;
+  font-size: 0.95rem;
+  justify-content: center;
+}
+
+.clue-badge {
+  background: #5b9bd5;
+  color: #fff;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.clue-text {
+  font-size: 0.95rem;
+  color: #222;
+  font-family: 'Frank Ruhl Libre', serif;
+  line-height: 1.4;
+}
+
+.clue-length {
+  color: #5b9bd5;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
