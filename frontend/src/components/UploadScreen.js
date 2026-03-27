@@ -49,7 +49,6 @@ function UploadScreen({ onPuzzleLoaded, onProcessingStart, onProcessingError, in
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          capture="environment"
           onChange={handleChange}
           style={{ display: 'none' }}
         />

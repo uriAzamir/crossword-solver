@@ -1,4 +1,4 @@
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const BASE_URL = process.env.REACT_APP_API_URL || 'https://crossword-solver-97og.onrender.com/api';
 
 export async function processPuzzleImage(file) {
   const formData = new FormData();
