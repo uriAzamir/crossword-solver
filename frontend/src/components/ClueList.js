@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import ClueItem from './ClueItem';
 import './ClueList.css';
 
-function ClueList({ clues, activeWord, onClueSelect }) {
+function ClueList({ clues, activeWord, onClueSelect, onEditClue }) {
   const activeRef = useRef(null);
 
   useEffect(() => {
@@ -26,6 +26,7 @@ function ClueList({ clues, activeWord, onClueSelect }) {
               clue={clue}
               isActive={isActive}
               onTap={(num) => onClueSelect(num, direction)}
+              onEdit={(newText) => onEditClue(direction, clue.number, newText)}
             />
           </div>
         );

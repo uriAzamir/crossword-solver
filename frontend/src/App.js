@@ -23,6 +23,7 @@ function App() {
     handleBackspace,
     handleArrow,
     getActiveWord,
+    editClue,
   } = usePuzzleState();
 
   useEffect(() => {
@@ -80,6 +81,7 @@ function App() {
           onBackspace={handleBackspace}
           onArrow={handleArrow}
           onNewPuzzle={handleNewPuzzle}
+          onEditClue={editClue}
         />
       )}
     </div>

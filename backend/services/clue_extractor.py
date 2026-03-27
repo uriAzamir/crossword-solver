@@ -16,22 +16,34 @@ def extract_clues(clue_region: np.ndarray) -> dict:
     image_b64 = _encode_image(clue_region)
     client = anthropic.Anthropic()
 
-    prompt = """This is the clue section of a Hebrew crossword puzzle.
+    prompt = """This is the clue section of a Hebrew crossword puzzle image.
 The RIGHT column (header: מאוזן) contains the ACROSS clues.
 The LEFT column (header: מאונך) contains the DOWN clues.
 
 Clue parsing rules:
-- Each clue starts with a number followed by a dot: "1."
-- Each clue ends with the letter count in parentheses followed by a semicolon: "(5);" or "(3,4);"
-- Clues can span multiple lines — keep reading until you see ");"
-- A new clue can start mid-line immediately after the previous ");"
-- The clue text is everything between the "N." and the "(count);"
+1. Each clue starts with a number followed by a dot: "1."
+2. Each clue ends with a semicolon ";" that comes after the letter count.
+3. The letter count is the LAST parenthetical before the ";". It contains ONLY digits and commas, e.g. "(5)" or "(3,4)" or "(6,3)".
+4. IMPORTANT: "(מ)" appearing inside the clue text is a wordplay hint that is PART OF THE CLUE TEXT — do NOT treat it as the letter count, and do NOT end the clue there.
+5. Clues can span multiple lines. A new clue only starts when you see the next "N." pattern after a ";".
+6. A new clue can begin mid-line immediately after the previous clue's ";".
+7. The clue TEXT is everything between "N." and the final "(digits);".
 
-Extract ALL clues from both columns and return ONLY valid JSON — no other text, no markdown:
-{"across": [{"number": 1, "text": "...", "length": "5"}], "down": [{"number": 1, "text": "...", "length": "3,4"}]}"""
+Examples of correct extraction:
+  Image text: "1. מושבה עקשנית עשויה למנוע חדירת גורמים עוינים (5,3);"
+  → {"number": 1, "text": "מושבה עקשנית עשויה למנוע חדירת גורמים עוינים", "length": "5,3"}
+
+  Image text: "6. מה אעשה אם ארצה לשכור שני תנורים? (מ) (5);"
+  → {"number": 6, "text": "מה אעשה אם ארצה לשכור שני תנורים? (מ)", "length": "5"}
+
+  Image text: "8. שימוש במברשת צבע אחרי תחילת הסיוד (מ) (5);"
+  → {"number": 8, "text": "שימוש במברשת צבע אחרי תחילת הסיוד (מ)", "length": "5"}
+
+Extract ALL clues from both columns and return ONLY valid JSON — no other text, no markdown, no code fences:
+{"across": [{"number": 1, "text": "...", "length": "5,3"}], "down": [{"number": 1, "text": "...", "length": "3"}]}"""
 
     response = client.messages.create(
-        model='claude-haiku-4-5-20251001',
+        model='claude-sonnet-4-6',
         max_tokens=2048,
         messages=[{
             'role': 'user',
@@ -50,13 +62,15 @@ Extract ALL clues from both columns and return ONLY valid JSON — no other text
     )
 
     raw = response.content[0].text.strip()
+    with open(r'C:\Users\User\Desktop\clue_debug.txt', 'w', encoding='utf-8') as f:
+        f.write(raw)
     clues = _parse_response(raw)
 
     # Retry once with stricter prompt if validation fails
     if not _validate_clues(clues):
         retry_prompt = prompt + '\n\nIMPORTANT: Your previous response was not valid JSON. Return ONLY the JSON object, starting with { and ending with }. Absolutely no other text.'
         response2 = client.messages.create(
-            model='claude-haiku-4-5-20251001',
+            model='claude-sonnet-4-6',
             max_tokens=2048,
             messages=[{
                 'role': 'user',

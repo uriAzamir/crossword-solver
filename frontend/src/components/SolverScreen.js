@@ -3,7 +3,6 @@ import CrosswordGrid from './CrosswordGrid';
 import ClueDisplay from './ClueDisplay';
 import ClueList from './ClueList';
 import { useKeyboard } from '../hooks/useKeyboard';
-import { getWordCells } from '../utils/puzzleUtils';
 import './SolverScreen.css';
 
 function SolverScreen({
@@ -16,7 +15,7 @@ function SolverScreen({
   onBackspace,
   onArrow,
   onNewPuzzle,
-  onClueSelect,
+  onEditClue,
 }) {
   const { inputRef, focusInput, handleInput, handleKeyDown } = useKeyboard({
     onLetter: onLetterInput,
@@ -90,6 +89,7 @@ function SolverScreen({
           clues={puzzle.clues}
           activeWord={activeWord}
           onClueSelect={handleClueSelect}
+          onEditClue={onEditClue}
         />
       </div>
     </div>

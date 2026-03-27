@@ -1,8 +1,9 @@
 flask
 flask-cors
-opencv-python
+opencv-python-headless
 anthropic
 python-dotenv
 pytesseract
 Pillow
 numpy
+gunicorn

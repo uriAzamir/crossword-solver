@@ -5,7 +5,7 @@
   border-bottom: 1px solid #eee;
   cursor: pointer;
   direction: rtl;
-  align-items: baseline;
+  align-items: center;
 }
 
 .clue-item:active {
@@ -35,4 +35,33 @@
 .clue-item-length {
   color: #5b9bd5;
   font-weight: 700;
+}
+
+.clue-edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 2px 4px;
+  margin-right: auto;
+  opacity: 0.6;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.clue-edit-btn:hover {
+  opacity: 1;
+}
+
+.clue-item-input {
+  flex: 1;
+  font-size: 0.88rem;
+  font-family: 'Frank Ruhl Libre', serif;
+  direction: rtl;
+  border: 1px solid #5b9bd5;
+  border-radius: 4px;
+  padding: 2px 6px;
+  background: #fff;
+  color: #111;
+  outline: none;
 }

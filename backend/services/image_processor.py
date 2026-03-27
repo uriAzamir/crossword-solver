@@ -22,8 +22,9 @@ def process_image(image_bytes: bytes) -> dict:
     content = img[y_start:h, 0:w]
     ch, cw = content.shape[:2]
 
-    # Split: right 33% → grid, left 67% → clues
-    split_x = int(cw * 0.67)
+    # Split: right ~38% → grid, left ~62% → clues
+    # Using 62% instead of 67% to ensure the leftmost grid column isn't cut off
+    split_x = int(cw * 0.62)
     grid_region = content[0:ch, split_x:cw]
     clue_region = content[0:ch, 0:split_x]
 

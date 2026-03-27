@@ -109,8 +109,8 @@ export function usePuzzleState() {
     const moves = {
       ArrowUp:    [-1,  0, 'down'],
       ArrowDown:  [ 1,  0, 'down'],
-      ArrowLeft:  [ 0, -1, 'across'],
-      ArrowRight: [ 0,  1, 'across'],
+      ArrowLeft:  [ 0, +1, 'across'],  // RTL: left arrow → higher col index (visually leftward)
+      ArrowRight: [ 0, -1, 'across'],  // RTL: right arrow → lower col index (visually rightward)
     };
 
     const move = moves[arrowDirection];
@@ -132,6 +132,19 @@ export function usePuzzleState() {
     return getWordAtCell(puzzle.grid, row, col, direction, puzzle.clues);
   }, [activeCell, puzzle]);
 
+  const editClue = useCallback((direction, number, newText) => {
+    if (!puzzle) return;
+    const newClues = {
+      ...puzzle.clues,
+      [direction]: puzzle.clues[direction].map(c =>
+        c.number === number ? { ...c, text: newText } : c
+      ),
+    };
+    const newPuzzleData = { ...puzzle, clues: newClues };
+    setPuzzle(newPuzzleData);
+    debouncedSave(newPuzzleData, letters);
+  }, [puzzle, letters, debouncedSave]);
+
   const hasSavedPuzzle = saved?.puzzle != null;
 
   return {
@@ -146,6 +159,7 @@ export function usePuzzleState() {
     handleBackspace,
     handleArrow,
     getActiveWord,
+    editClue,
     // Restore saved puzzle on mount
     savedPuzzle: saved?.puzzle || null,
     savedLetters: saved?.letters || {},
