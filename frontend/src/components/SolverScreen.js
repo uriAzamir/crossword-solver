@@ -18,6 +18,9 @@ function SolverScreen({
   onEditClue,
 }) {
   const [showClues, setShowClues] = useState(false);
+  const [screenHeight, setScreenHeight] = useState(
+    () => window.visualViewport ? window.visualViewport.height : window.innerHeight
+  );
 
   const { inputRef, focusInput, handleInput, handleKeyDown } = useKeyboard({
     onLetter: onLetterInput,
@@ -29,15 +32,9 @@ function SolverScreen({
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
-    const update = () => {
-      document.documentElement.style.setProperty('--vvh', `${vv.height}px`);
-    };
+    const update = () => setScreenHeight(vv.height);
     vv.addEventListener('resize', update);
-    update();
-    return () => {
-      vv.removeEventListener('resize', update);
-      document.documentElement.style.removeProperty('--vvh');
-    };
+    return () => vv.removeEventListener('resize', update);
   }, []);
 
   const handleGridTap = useCallback((row, col) => {
@@ -65,7 +62,7 @@ function SolverScreen({
   }, [puzzle, onCellTap, focusInput]);
 
   return (
-    <div className="solver-screen">
+    <div className="solver-screen" style={{ height: screenHeight }}>
       {/* Hidden input to capture keyboard on mobile */}
       <input
         ref={inputRef}
