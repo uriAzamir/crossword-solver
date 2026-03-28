@@ -60,8 +60,9 @@ function SolverScreen({
         lang="he"
         autoCorrect="off"
         autoCapitalize="off"
-        autoComplete="off"
+        autoComplete="new-password"
         spellCheck="false"
+        data-form-type="other"
         onInput={handleInput}
         onKeyDown={handleKeyDown}
         readOnly={false}
