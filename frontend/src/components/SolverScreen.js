@@ -30,11 +30,18 @@ function SolverScreen({
   });
 
   useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const update = () => setScreenHeight(vv.height);
-    vv.addEventListener('resize', update);
-    return () => vv.removeEventListener('resize', update);
+    const update = () => {
+      const vv = window.visualViewport;
+      setScreenHeight(vv ? vv.height : window.innerHeight);
+    };
+    window.addEventListener('resize', update);
+    window.visualViewport?.addEventListener('resize', update);
+    window.visualViewport?.addEventListener('scroll', update);
+    return () => {
+      window.removeEventListener('resize', update);
+      window.visualViewport?.removeEventListener('resize', update);
+      window.visualViewport?.removeEventListener('scroll', update);
+    };
   }, []);
 
   const handleGridTap = useCallback((row, col) => {
