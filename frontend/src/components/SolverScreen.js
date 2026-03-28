@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import CrosswordGrid from './CrosswordGrid';
 import ClueDisplay from './ClueDisplay';
 import ClueList from './ClueList';
@@ -17,6 +17,8 @@ function SolverScreen({
   onNewPuzzle,
   onEditClue,
 }) {
+  const [showClues, setShowClues] = useState(false);
+
   const { inputRef, focusInput, handleInput, handleKeyDown } = useKeyboard({
     onLetter: onLetterInput,
     onBackspace,
@@ -99,14 +101,26 @@ function SolverScreen({
         />
       </div>
 
-      <div className="solver-clues-area">
-        <ClueList
-          clues={puzzle.clues}
-          activeWord={activeWord}
-          onClueSelect={handleClueSelect}
-          onEditClue={onEditClue}
-        />
-      </div>
+      <button className="clues-toggle-btn" onClick={() => setShowClues(true)}>
+        רשימת רמזים
+      </button>
+
+      {showClues && (
+        <div className="clues-overlay">
+          <div className="clues-overlay-header">
+            <span>רמזים</span>
+            <button className="clues-overlay-close" onClick={() => setShowClues(false)}>✕</button>
+          </div>
+          <div className="clues-overlay-body">
+            <ClueList
+              clues={puzzle.clues}
+              activeWord={activeWord}
+              onClueSelect={(number, direction) => { handleClueSelect(number, direction); setShowClues(false); }}
+              onEditClue={onEditClue}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

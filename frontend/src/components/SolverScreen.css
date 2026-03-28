@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
+  overflow-y: auto;
   background: #f5f8fc;
   padding-bottom: var(--keyboard-height, 0px);
   box-sizing: border-box;
@@ -19,6 +19,9 @@
 }
 
 .solver-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   align-items: stretch;
   background: #f0f7ff;
@@ -60,13 +63,54 @@
   width: 100%;
 }
 
-.solver-clues-area {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+.clues-toggle-btn {
+  margin: 16px auto;
+  display: block;
+  padding: 12px 32px;
+  background: #5b9bd5;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
 }
 
-.solver-clues-area .clue-list {
+.clues-toggle-btn:active {
+  background: #3d7bb5;
+}
+
+.clues-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.clues-overlay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: #f0f7ff;
+  border-bottom: 2px solid #5b9bd5;
+  font-size: 1.1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.clues-overlay-close {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: #5a7d9a;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.clues-overlay-body {
   flex: 1;
+  overflow-y: auto;
 }
