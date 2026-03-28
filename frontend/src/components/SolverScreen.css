@@ -1,10 +1,9 @@
 .solver-screen {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: var(--vvh, 100%);
   overflow-y: auto;
   background: #f5f8fc;
-  padding-bottom: var(--keyboard-height, 0px);
   box-sizing: border-box;
 }
 

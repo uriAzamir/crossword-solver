@@ -30,13 +30,13 @@ function SolverScreen({
     const vv = window.visualViewport;
     if (!vv) return;
     const update = () => {
-      const offset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      document.documentElement.style.setProperty('--keyboard-height', `${offset}px`);
+      document.documentElement.style.setProperty('--vvh', `${vv.height}px`);
     };
     vv.addEventListener('resize', update);
+    update();
     return () => {
       vv.removeEventListener('resize', update);
-      document.documentElement.style.removeProperty('--keyboard-height');
+      document.documentElement.style.removeProperty('--vvh');
     };
   }, []);
 
