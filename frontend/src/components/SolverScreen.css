@@ -1,4 +1,5 @@
 .solver-screen {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -16,29 +17,21 @@
   pointer-events: none;
 }
 
-.solver-topbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: flex;
-  align-items: stretch;
-  background: #f0f7ff;
-  border-bottom: 2px solid #5b9bd5;
-  flex-shrink: 0;
-}
-
-.solver-topbar .clue-display {
-  flex: 1;
-  border-bottom: none;
-}
-
 .new-puzzle-btn {
-  background: transparent;
-  border: none;
-  border-right: 1px solid #c8ddf0;
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  z-index: 10;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid #c8ddf0;
+  border-radius: 50%;
   color: #5a7d9a;
-  font-size: 1.1rem;
-  padding: 0 14px;
+  font-size: 1rem;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -48,35 +41,52 @@
 }
 
 .solver-grid-area {
+  flex: 1;
+  min-height: 0;
   padding: 12px;
   background: #fff;
-  border-bottom: 2px solid #dde8f4;
-  flex-shrink: 0;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .solver-grid-area .crossword-grid {
-  /* dvh shrinks when keyboard+toolbar opens; extra 50px accounts for autofill toolbar */
   width: min(100%, calc(100vh - 200px));
   width: min(100%, calc(100dvh - 200px));
 }
 
+.solver-bottom-bar {
+  flex-shrink: 0;
+  background: #f0f7ff;
+  border-top: 2px solid #5b9bd5;
+}
+
+.solver-bottom-bar .clue-display {
+  border-bottom: 1px solid #dde8f4;
+  min-height: 0;
+  padding: 10px 14px;
+}
+
+.solver-bottom-bar .clue-text {
+  font-size: 1.2rem;
+}
+
 .clues-toggle-btn {
-  margin: 16px auto;
   display: block;
-  padding: 12px 32px;
-  background: #5b9bd5;
-  color: #fff;
+  width: 100%;
+  padding: 12px;
+  background: #f0f7ff;
+  color: #5b9bd5;
   border: none;
-  border-radius: 24px;
   font-size: 1rem;
   font-family: inherit;
+  font-weight: 700;
   cursor: pointer;
+  text-align: center;
 }
 
 .clues-toggle-btn:active {
-  background: #3d7bb5;
+  background: #ddeeff;
 }
 
 .clues-overlay {
