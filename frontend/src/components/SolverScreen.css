@@ -57,9 +57,9 @@
 }
 
 .solver-grid-area .crossword-grid {
-  /* dvh shrinks when the iOS keyboard opens, keeping the grid above it */
-  width: min(100%, calc(100vh - 150px));
-  width: min(100%, calc(100dvh - 150px));
+  /* dvh shrinks when keyboard+toolbar opens; extra 50px accounts for autofill toolbar */
+  width: min(100%, calc(100vh - 200px));
+  width: min(100%, calc(100dvh - 200px));
 }
 
 .clues-toggle-btn {
