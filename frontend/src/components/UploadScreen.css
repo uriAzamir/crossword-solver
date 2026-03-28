@@ -20,7 +20,7 @@
   font-weight: 900;
   color: #2c5f8a;
   margin: 0 0 6px;
-  font-family: 'Frank Ruhl Libre', serif;
+  font-family: inherit;
 }
 
 .upload-subtitle {
@@ -57,7 +57,7 @@
   font-weight: 700;
   color: #2c5f8a;
   margin: 0 0 8px;
-  font-family: 'Frank Ruhl Libre', serif;
+  font-family: inherit;
 }
 
 .upload-secondary {
@@ -88,7 +88,7 @@
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  font-family: 'Frank Ruhl Libre', serif;
+  font-family: inherit;
   width: 100%;
   max-width: 340px;
 }

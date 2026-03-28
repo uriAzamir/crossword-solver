@@ -27,7 +27,7 @@
   font-weight: 700;
   color: #2c5f8a;
   margin: 0;
-  font-family: 'Frank Ruhl Libre', serif;
+  font-family: inherit;
 }
 
 .processing-sub {
