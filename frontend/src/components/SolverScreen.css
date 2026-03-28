@@ -17,9 +17,6 @@
 }
 
 .solver-topbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
   display: flex;
   align-items: stretch;
   background: #f0f7ff;
