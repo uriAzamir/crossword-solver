@@ -29,6 +29,14 @@ function SolverScreen({
     active: !!activeCell,
   });
 
+  // Auto-open keyboard on mount
+  useEffect(() => {
+    const t = setTimeout(focusInput, 150);
+    return () => clearTimeout(t);
+  }, [focusInput]);
+
+  // Track available height above keyboard.
+  // Poll for 1.5s after mount to catch browsers that don't fire resize on keyboard open.
   useEffect(() => {
     const update = () => {
       const vv = window.visualViewport;
@@ -37,10 +45,18 @@ function SolverScreen({
     window.addEventListener('resize', update);
     window.visualViewport?.addEventListener('resize', update);
     window.visualViewport?.addEventListener('scroll', update);
+
+    let polls = 0;
+    const pollId = setInterval(() => {
+      update();
+      if (++polls >= 15) clearInterval(pollId);
+    }, 100);
+
     return () => {
       window.removeEventListener('resize', update);
       window.visualViewport?.removeEventListener('resize', update);
       window.visualViewport?.removeEventListener('scroll', update);
+      clearInterval(pollId);
     };
   }, []);
 
@@ -50,12 +66,9 @@ function SolverScreen({
   }, [onCellTap, focusInput]);
 
   const handleClueSelect = useCallback((number, direction) => {
-    // Find the first cell of that word and activate it
     const clueList = direction === 'across' ? puzzle.clues.across : puzzle.clues.down;
     const clue = clueList.find(c => c.number === number);
     if (!clue) return;
-
-    // Find the numbered cell in the grid
     const { rows, cols, cells } = puzzle.grid;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
@@ -67,6 +80,16 @@ function SolverScreen({
       }
     }
   }, [puzzle, onCellTap, focusInput]);
+
+  const openClues = () => {
+    inputRef.current?.blur();
+    setShowClues(true);
+  };
+
+  const closeClues = () => {
+    setShowClues(false);
+    setTimeout(focusInput, 100);
+  };
 
   return (
     <div className="solver-screen" style={{ height: screenHeight }}>
@@ -105,7 +128,7 @@ function SolverScreen({
         />
       </div>
 
-      <button className="clues-toggle-btn" onClick={() => setShowClues(true)}>
+      <button className="clues-toggle-btn" onClick={openClues}>
         רשימת רמזים
       </button>
 
@@ -113,13 +136,13 @@ function SolverScreen({
         <div className="clues-overlay">
           <div className="clues-overlay-header">
             <span>רמזים</span>
-            <button className="clues-overlay-close" onClick={() => setShowClues(false)}>✕</button>
+            <button className="clues-overlay-close" onClick={closeClues}>✕</button>
           </div>
           <div className="clues-overlay-body">
             <ClueList
               clues={puzzle.clues}
               activeWord={activeWord}
-              onClueSelect={(number, direction) => { handleClueSelect(number, direction); setShowClues(false); }}
+              onClueSelect={(number, direction) => { handleClueSelect(number, direction); closeClues(); }}
               onEditClue={onEditClue}
             />
           </div>
