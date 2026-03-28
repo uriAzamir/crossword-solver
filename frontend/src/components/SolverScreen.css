@@ -2,9 +2,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow-y: auto;
+  overflow: hidden;
   background: #f5f8fc;
-  box-sizing: border-box;
 }
 
 .hidden-input {
@@ -58,8 +57,9 @@
 }
 
 .solver-grid-area .crossword-grid {
-  max-width: 380px;
-  width: 100%;
+  /* dvh shrinks when the iOS keyboard opens, keeping the grid above it */
+  width: min(100%, calc(100vh - 150px));
+  width: min(100%, calc(100dvh - 150px));
 }
 
 .clues-toggle-btn {

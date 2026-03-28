@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import CrosswordGrid from './CrosswordGrid';
 import ClueDisplay from './ClueDisplay';
 import ClueList from './ClueList';
@@ -18,9 +18,6 @@ function SolverScreen({
   onEditClue,
 }) {
   const [showClues, setShowClues] = useState(false);
-  const [screenHeight, setScreenHeight] = useState(
-    () => window.visualViewport ? window.visualViewport.height : window.innerHeight
-  );
 
   const { inputRef, focusInput, handleInput, handleKeyDown } = useKeyboard({
     onLetter: onLetterInput,
@@ -28,37 +25,6 @@ function SolverScreen({
     onArrow,
     active: !!activeCell,
   });
-
-  // Auto-open keyboard on mount
-  useEffect(() => {
-    const t = setTimeout(focusInput, 150);
-    return () => clearTimeout(t);
-  }, [focusInput]);
-
-  // Track available height above keyboard.
-  // Poll for 1.5s after mount to catch browsers that don't fire resize on keyboard open.
-  useEffect(() => {
-    const update = () => {
-      const vv = window.visualViewport;
-      setScreenHeight(vv ? vv.height : window.innerHeight);
-    };
-    window.addEventListener('resize', update);
-    window.visualViewport?.addEventListener('resize', update);
-    window.visualViewport?.addEventListener('scroll', update);
-
-    let polls = 0;
-    const pollId = setInterval(() => {
-      update();
-      if (++polls >= 15) clearInterval(pollId);
-    }, 100);
-
-    return () => {
-      window.removeEventListener('resize', update);
-      window.visualViewport?.removeEventListener('resize', update);
-      window.visualViewport?.removeEventListener('scroll', update);
-      clearInterval(pollId);
-    };
-  }, []);
 
   const handleGridTap = useCallback((row, col) => {
     onCellTap(row, col);
@@ -92,7 +58,7 @@ function SolverScreen({
   };
 
   return (
-    <div className="solver-screen" style={{ height: screenHeight }}>
+    <div className="solver-screen">
       {/* Hidden input to capture keyboard on mobile */}
       <input
         ref={inputRef}
