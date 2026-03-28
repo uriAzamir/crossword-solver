@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import CrosswordGrid from './CrosswordGrid';
 import ClueDisplay from './ClueDisplay';
 import ClueList from './ClueList';
@@ -23,6 +23,20 @@ function SolverScreen({
     onArrow,
     active: !!activeCell,
   });
+
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const offset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      document.documentElement.style.setProperty('--keyboard-height', `${offset}px`);
+    };
+    vv.addEventListener('resize', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      document.documentElement.style.removeProperty('--keyboard-height');
+    };
+  }, []);
 
   const handleGridTap = useCallback((row, col) => {
     onCellTap(row, col);

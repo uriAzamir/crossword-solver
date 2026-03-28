@@ -4,6 +4,8 @@
   height: 100%;
   overflow: hidden;
   background: #f5f8fc;
+  padding-bottom: var(--keyboard-height, 0px);
+  box-sizing: border-box;
 }
 
 .hidden-input {
