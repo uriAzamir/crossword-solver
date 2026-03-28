@@ -77,9 +77,12 @@ function SolverScreen({
         readOnly={false}
       />
 
-      <button className="new-puzzle-btn" onClick={onNewPuzzle} title="תשבץ חדש">
-        ✕
-      </button>
+      <div className="solver-topbar">
+        <ClueDisplay activeWord={activeWord} />
+        <button className="new-puzzle-btn" onClick={onNewPuzzle} title="תשבץ חדש">
+          ✕
+        </button>
+      </div>
 
       <div className="solver-grid-area">
         <CrosswordGrid
@@ -91,12 +94,9 @@ function SolverScreen({
         />
       </div>
 
-      <div className="solver-bottom-bar">
-        <ClueDisplay activeWord={activeWord} />
-        <button className="clues-toggle-btn" onClick={openClues}>
-          רשימת רמזים
-        </button>
-      </div>
+      <button className="clues-toggle-btn" onClick={openClues}>
+        רשימת רמזים
+      </button>
 
       {showClues && (
         <div className="clues-overlay">
