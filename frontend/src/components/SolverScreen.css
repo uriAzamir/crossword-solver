@@ -1,4 +1,5 @@
 .solver-screen {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -7,35 +8,31 @@
 }
 
 .hidden-input {
-  position: fixed;
-  top: -100px;
-  left: -100px;
   width: 1px;
   height: 1px;
   opacity: 0;
   pointer-events: none;
-}
-
-.solver-topbar {
-  display: flex;
-  align-items: stretch;
-  background: #f0f7ff;
-  border-bottom: 2px solid #5b9bd5;
-  flex-shrink: 0;
-}
-
-.solver-topbar .clue-display {
-  flex: 1;
-  border-bottom: none;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
 }
 
 .new-puzzle-btn {
-  background: transparent;
-  border: none;
-  border-right: 1px solid #c8ddf0;
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  z-index: 10;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid #c8ddf0;
+  border-radius: 50%;
   color: #5a7d9a;
-  font-size: 1.1rem;
-  padding: 0 14px;
+  font-size: 1rem;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -45,12 +42,14 @@
 }
 
 .solver-grid-area {
+  flex: 1;
+  min-height: 0;
   padding: 12px;
+  padding-bottom: 110px;
   background: #fff;
-  border-bottom: 2px solid #dde8f4;
-  flex-shrink: 0;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .solver-grid-area .crossword-grid {
@@ -58,21 +57,71 @@
   width: min(100%, calc(100dvh - 200px));
 }
 
-.clues-toggle-btn {
-  margin: 16px auto;
-  display: block;
-  padding: 12px 32px;
-  background: #5b9bd5;
-  color: #fff;
+.solver-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: #f0f7ff;
+  border-top: 2px solid #5b9bd5;
+}
+
+.clue-nav-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid #dde8f4;
+}
+
+.clue-nav-btn {
+  flex-shrink: 0;
+  background: transparent;
   border: none;
-  border-radius: 24px;
+  color: #5b9bd5;
+  font-size: 1.8rem;
+  line-height: 1;
+  padding: 0 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.clue-nav-btn:active {
+  background: #ddeeff;
+}
+
+.clue-nav-btn:disabled {
+  color: #c0cdd8;
+  cursor: default;
+}
+
+.clue-nav-row .clue-display {
+  flex: 1;
+  border-bottom: none;
+  min-height: 0;
+  padding: 10px 4px;
+}
+
+.solver-bottom-bar .clue-text {
+  font-size: 1.2rem;
+}
+
+.clues-toggle-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: #f0f7ff;
+  color: #5b9bd5;
+  border: none;
   font-size: 1rem;
   font-family: inherit;
+  font-weight: 700;
   cursor: pointer;
+  text-align: center;
 }
 
 .clues-toggle-btn:active {
-  background: #3d7bb5;
+  background: #ddeeff;
 }
 
 .clues-overlay {

@@ -19,6 +19,7 @@ function App() {
     loadPuzzle,
     newPuzzle,
     handleCellTap,
+    handleJumpToClue,
     handleLetterInput,
     handleBackspace,
     handleArrow,
@@ -77,6 +78,7 @@ function App() {
           activeCell={activeCell}
           activeWord={activeWord}
           onCellTap={handleCellTap}
+          onJumpToClue={handleJumpToClue}
           onLetterInput={handleLetterInput}
           onBackspace={handleBackspace}
           onArrow={handleArrow}

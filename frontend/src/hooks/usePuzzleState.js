@@ -101,6 +101,13 @@ export function usePuzzleState() {
     }
   }, [activeCell, puzzle, letters, debouncedSave]);
 
+  const handleJumpToClue = useCallback((row, col, direction) => {
+    if (!puzzle) return;
+    const cell = puzzle.grid.cells[row][col];
+    if (cell.blocked) return;
+    setActiveCell({ row, col, direction });
+  }, [puzzle]);
+
   const handleArrow = useCallback((arrowDirection) => {
     if (!activeCell || !puzzle) return;
     const { row, col } = activeCell;
@@ -155,6 +162,7 @@ export function usePuzzleState() {
     loadPuzzle,
     newPuzzle,
     handleCellTap,
+    handleJumpToClue,
     handleLetterInput,
     handleBackspace,
     handleArrow,
