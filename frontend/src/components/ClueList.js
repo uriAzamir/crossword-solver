@@ -1,16 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import ClueItem from './ClueItem';
 import './ClueList.css';
 
 function ClueList({ clues, activeWord, onClueSelect, onEditClue }) {
-  const activeRef = useRef(null);
-
-  useEffect(() => {
-    if (activeRef.current) {
-      activeRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    }
-  }, [activeWord]);
-
   const renderSection = (title, clueList, direction) => (
     <div className="clue-section">
       <h3 className="clue-section-title">{title}</h3>
@@ -21,7 +13,7 @@ function ClueList({ clues, activeWord, onClueSelect, onEditClue }) {
           activeWord.number === clue.number;
 
         return (
-          <div key={clue.number} ref={isActive ? activeRef : null}>
+          <div key={clue.number}>
             <ClueItem
               clue={clue}
               isActive={isActive}
