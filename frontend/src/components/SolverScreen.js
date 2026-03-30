@@ -112,16 +112,6 @@ function SolverScreen({
         ✕
       </button>
 
-      <div className="solver-grid-area">
-        <CrosswordGrid
-          grid={puzzle.grid}
-          letters={letters}
-          activeCell={activeCell}
-          activeWord={activeWord}
-          onCellTap={handleGridTap}
-        />
-      </div>
-
       <div className="solver-bottom-bar">
         <div className="clue-nav-row">
           <button className="clue-nav-btn" onClick={() => navigateClue('prev')} disabled={!activeWord}>‹</button>
@@ -131,6 +121,16 @@ function SolverScreen({
         <button className="clues-toggle-btn" onClick={openClues}>
           רשימת רמזים
         </button>
+      </div>
+
+      <div className="solver-grid-area">
+        <CrosswordGrid
+          grid={puzzle.grid}
+          letters={letters}
+          activeCell={activeCell}
+          activeWord={activeWord}
+          onCellTap={handleGridTap}
+        />
       </div>
 
       {showClues && (
