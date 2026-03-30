@@ -69,8 +69,11 @@ export function usePuzzleState() {
     setLetters(newLetters);
     debouncedSave(puzzle, newLetters);
 
-    // Advance to next cell
-    const next = getNextCell(puzzle.grid, row, col, direction);
+    // Advance to next empty cell (skip pre-filled cells)
+    let next = getNextCell(puzzle.grid, row, col, direction);
+    while (next && newLetters[`${next[0]},${next[1]}`]) {
+      next = getNextCell(puzzle.grid, next[0], next[1], direction);
+    }
     if (next) {
       setActiveCell({ row: next[0], col: next[1], direction });
     }

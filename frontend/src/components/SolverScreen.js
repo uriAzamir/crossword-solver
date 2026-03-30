@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import CrosswordGrid from './CrosswordGrid';
 import ClueDisplay from './ClueDisplay';
 import ClueList from './ClueList';
@@ -18,7 +18,6 @@ function SolverScreen({
   onNewPuzzle,
   onEditClue,
 }) {
-  const [showClues, setShowClues] = useState(false);
 
   const { inputRef, focusInput, handleInput, handleKeyDown } = useKeyboard({
     onLetter: onLetterInput,
@@ -80,16 +79,6 @@ function SolverScreen({
     if (nextClue) handleClueSelect(nextClue.number, nextDirection);
   }, [activeWord, puzzle, handleClueSelect]);
 
-  const openClues = () => {
-    inputRef.current?.blur();
-    setShowClues(true);
-  };
-
-  const closeClues = () => {
-    setShowClues(false);
-    setTimeout(focusInput, 100);
-  };
-
   return (
     <div className="solver-screen">
       {/* Hidden contenteditable div to capture keyboard on mobile — avoids Chrome iOS autofill toolbar */}
@@ -107,10 +96,6 @@ function SolverScreen({
         onInput={handleInput}
         onKeyDown={handleKeyDown}
       />
-
-      <button className="new-puzzle-btn" onClick={onNewPuzzle} title="תשבץ חדש">
-        ✕
-      </button>
 
       <div className="solver-bottom-bar">
         <div className="clue-nav-row">
@@ -131,27 +116,17 @@ function SolverScreen({
           />
         </div>
 
-        <button className="clues-toggle-btn" onClick={openClues}>
-          רשימת רמזים
+        <ClueList
+          clues={puzzle.clues}
+          activeWord={activeWord}
+          onClueSelect={handleClueSelect}
+          onEditClue={onEditClue}
+        />
+
+        <button className="upload-new-btn" onClick={onNewPuzzle}>
+          העלה תשבץ חדש
         </button>
       </div>
-
-      {showClues && (
-        <div className="clues-overlay">
-          <div className="clues-overlay-header">
-            <span>רמזים</span>
-            <button className="clues-overlay-close" onClick={closeClues}>✕</button>
-          </div>
-          <div className="clues-overlay-body">
-            <ClueList
-              clues={puzzle.clues}
-              activeWord={activeWord}
-              onClueSelect={(number, direction) => { handleClueSelect(number, direction); closeClues(); }}
-              onEditClue={onEditClue}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

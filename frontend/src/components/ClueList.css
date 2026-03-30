@@ -1,6 +1,4 @@
 .clue-list {
-  overflow-y: auto;
-  flex: 1;
   background: #fff;
   direction: rtl;
 }
