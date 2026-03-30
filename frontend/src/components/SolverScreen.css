@@ -44,19 +44,24 @@
   background: #e0edf8;
 }
 
-.solver-grid-area {
+.solver-content {
   flex: 1;
   min-height: 0;
-  padding: 4px 12px 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   background: #fff;
+}
+
+.solver-grid-area {
+  padding: 4px 12px 12px;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .solver-grid-area .crossword-grid {
-  width: min(90%, calc(100vh - 200px));
-  width: min(90%, calc(100dvh - 200px));
+  width: 90%;
 }
 
 .solver-bottom-bar {

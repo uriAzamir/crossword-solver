@@ -120,19 +120,21 @@ function SolverScreen({
         </div>
       </div>
 
-      <div className="solver-grid-area">
-        <CrosswordGrid
-          grid={puzzle.grid}
-          letters={letters}
-          activeCell={activeCell}
-          activeWord={activeWord}
-          onCellTap={handleGridTap}
-        />
-      </div>
+      <div className="solver-content">
+        <div className="solver-grid-area">
+          <CrosswordGrid
+            grid={puzzle.grid}
+            letters={letters}
+            activeCell={activeCell}
+            activeWord={activeWord}
+            onCellTap={handleGridTap}
+          />
+        </div>
 
-      <button className="clues-toggle-btn" onClick={openClues}>
-        רשימת רמזים
-      </button>
+        <button className="clues-toggle-btn" onClick={openClues}>
+          רשימת רמזים
+        </button>
+      </div>
 
       {showClues && (
         <div className="clues-overlay">
