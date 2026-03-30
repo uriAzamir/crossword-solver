@@ -1,8 +1,9 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import CrosswordGrid from './CrosswordGrid';
 import ClueDisplay from './ClueDisplay';
 import ClueList from './ClueList';
 import { useKeyboard } from '../hooks/useKeyboard';
+import { getWordCells } from '../utils/puzzleUtils';
 import './SolverScreen.css';
 
 function SolverScreen({
@@ -20,6 +21,32 @@ function SolverScreen({
 }) {
 
   const contentRef = useRef(null);
+
+  const solvedClues = useMemo(() => {
+    if (!puzzle) return new Set();
+    const solved = new Set();
+    const { grid } = puzzle;
+    const checkDirection = (clueList, direction) => {
+      for (const clue of clueList) {
+        let startRow = -1, startCol = -1;
+        outer: for (let r = 0; r < grid.rows; r++) {
+          for (let c = 0; c < grid.cols; c++) {
+            if (grid.cells[r][c].number === clue.number) {
+              startRow = r; startCol = c; break outer;
+            }
+          }
+        }
+        if (startRow === -1) continue;
+        const wordCells = getWordCells(grid, startRow, startCol, direction);
+        if (wordCells.every(([r, c]) => letters[`${r},${c}`])) {
+          solved.add(`${direction}-${clue.number}`);
+        }
+      }
+    };
+    checkDirection(puzzle.clues.across, 'across');
+    checkDirection(puzzle.clues.down, 'down');
+    return solved;
+  }, [puzzle, letters]);
 
   const { inputRef, focusInput, handleInput, handleKeyDown } = useKeyboard({
     onLetter: onLetterInput,
@@ -122,6 +149,7 @@ function SolverScreen({
         <ClueList
           clues={puzzle.clues}
           activeWord={activeWord}
+          solvedClues={solvedClues}
           onClueSelect={handleClueSelect}
           onEditClue={onEditClue}
         />

@@ -17,6 +17,19 @@
   border-right: 3px solid #5b9bd5;
 }
 
+.clue-item--solved {
+  background: #f0faf0;
+}
+
+.clue-item--solved .clue-item-number {
+  color: #5a9e6f;
+}
+
+.clue-item--solved .clue-item-text {
+  color: #999;
+  text-decoration: line-through;
+}
+
 .clue-item-number {
   font-weight: 700;
   color: #5b9bd5;

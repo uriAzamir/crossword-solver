@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './ClueItem.css';
 
-function ClueItem({ clue, isActive, onTap, onEdit }) {
+function ClueItem({ clue, isActive, isSolved, onTap, onEdit }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(clue.text);
   const inputRef = useRef(null);
@@ -34,7 +34,7 @@ function ClueItem({ clue, isActive, onTap, onEdit }) {
 
   return (
     <div
-      className={`clue-item ${isActive ? 'clue-item--active' : ''}`}
+      className={`clue-item ${isActive ? 'clue-item--active' : ''} ${isSolved ? 'clue-item--solved' : ''}`}
       onClick={() => !editing && onTap(clue.number)}
     >
       <span className="clue-item-number">{clue.number}.</span>
