@@ -92,27 +92,21 @@ function SolverScreen({
 
   return (
     <div className="solver-screen">
-      {/* Hidden input to capture keyboard on mobile */}
-      {/* form wrapper suppresses Chrome iOS autofill toolbar */}
-      <form autoComplete="off" style={{ position: 'fixed', top: -200, left: -200, width: 1, height: 1, overflow: 'hidden' }}>
-        <input
-          ref={inputRef}
-          className="hidden-input"
-          type="text"
-          inputMode="text"
-          dir="rtl"
-          lang="he"
-          autoCorrect="off"
-          autoCapitalize="off"
-          autoComplete="off"
-          spellCheck="false"
-          data-form-type="other"
-          data-lpignore="true"
-          onInput={handleInput}
-          onKeyDown={handleKeyDown}
-          readOnly={false}
-        />
-      </form>
+      {/* Hidden contenteditable div to capture keyboard on mobile — avoids Chrome iOS autofill toolbar */}
+      <div
+        ref={inputRef}
+        className="hidden-input"
+        contentEditable
+        suppressContentEditableWarning
+        dir="rtl"
+        lang="he"
+        inputMode="text"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck={false}
+        onInput={handleInput}
+        onKeyDown={handleKeyDown}
+      />
 
       <button className="new-puzzle-btn" onClick={onNewPuzzle} title="תשבץ חדש">
         ✕

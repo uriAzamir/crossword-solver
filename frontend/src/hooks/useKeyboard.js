@@ -20,11 +20,11 @@ export function useKeyboard({ onLetter, onBackspace, onArrow, active }) {
 
   // Handle input event (primary — works reliably on mobile IMEs)
   const handleInput = useCallback((e) => {
-    const value = e.target.value;
+    const value = e.target.textContent;
     if (!value) return;
 
     // Clear immediately to prevent accumulation
-    e.target.value = '';
+    e.target.textContent = '';
 
     // Take last character (in case IME composed multiple)
     const char = value[value.length - 1];
