@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import CrosswordGrid from './CrosswordGrid';
 import ClueDisplay from './ClueDisplay';
 import ClueList from './ClueList';
@@ -18,6 +18,8 @@ function SolverScreen({
   onNewPuzzle,
   onEditClue,
 }) {
+
+  const contentRef = useRef(null);
 
   const { inputRef, focusInput, handleInput, handleKeyDown } = useKeyboard({
     onLetter: onLetterInput,
@@ -41,6 +43,7 @@ function SolverScreen({
         if (cells[r][c].number === number) {
           onJumpToClue(r, c, direction);
           focusInput();
+          contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
       }
@@ -105,7 +108,7 @@ function SolverScreen({
         </div>
       </div>
 
-      <div className="solver-content">
+      <div className="solver-content" ref={contentRef}>
         <div className="solver-grid-area">
           <CrosswordGrid
             grid={puzzle.grid}
