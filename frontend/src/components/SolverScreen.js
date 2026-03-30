@@ -118,9 +118,6 @@ function SolverScreen({
           <ClueDisplay activeWord={activeWord} />
           <button className="clue-nav-btn" onClick={() => navigateClue('next')} disabled={!activeWord}>›</button>
         </div>
-        <button className="clues-toggle-btn" onClick={openClues}>
-          רשימת רמזים
-        </button>
       </div>
 
       <div className="solver-grid-area">
@@ -132,6 +129,10 @@ function SolverScreen({
           onCellTap={handleGridTap}
         />
       </div>
+
+      <button className="clues-toggle-btn" onClick={openClues}>
+        רשימת רמזים
+      </button>
 
       {showClues && (
         <div className="clues-overlay">

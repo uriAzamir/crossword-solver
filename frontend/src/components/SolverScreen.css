@@ -47,7 +47,7 @@
 .solver-grid-area {
   flex: 1;
   min-height: 0;
-  padding: 12px;
+  padding: 4px 12px 12px;
   background: #fff;
   display: flex;
   justify-content: center;
@@ -55,8 +55,8 @@
 }
 
 .solver-grid-area .crossword-grid {
-  width: min(80%, calc(100vh - 200px));
-  width: min(80%, calc(100dvh - 200px));
+  width: min(90%, calc(100vh - 200px));
+  width: min(90%, calc(100dvh - 200px));
 }
 
 .solver-bottom-bar {
