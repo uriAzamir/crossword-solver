@@ -79,35 +79,32 @@ function SolverScreen({
 
   const navigateClue = useCallback((direction) => {
     if (!activeWord || !puzzle) return;
-    const acrossClues = puzzle.clues.across;
-    const downClues = puzzle.clues.down;
-    const currentList = activeWord.direction === 'across' ? acrossClues : downClues;
-    const currentIdx = currentList.findIndex(c => c.number === activeWord.number);
+    const allClues = [
+      ...puzzle.clues.across.map(c => ({ ...c, direction: 'across' })),
+      ...puzzle.clues.down.map(c => ({ ...c, direction: 'down' })),
+    ];
+    const currentIdx = allClues.findIndex(
+      c => c.direction === activeWord.direction && c.number === activeWord.number
+    );
+    if (currentIdx === -1) return;
 
-    let nextClue, nextDirection;
-    if (direction === 'next') {
-      if (currentIdx < currentList.length - 1) {
-        nextClue = currentList[currentIdx + 1];
-        nextDirection = activeWord.direction;
-      } else {
-        // wrap to other direction
-        const otherList = activeWord.direction === 'across' ? downClues : acrossClues;
-        nextClue = otherList[0];
-        nextDirection = activeWord.direction === 'across' ? 'down' : 'across';
-      }
-    } else {
-      if (currentIdx > 0) {
-        nextClue = currentList[currentIdx - 1];
-        nextDirection = activeWord.direction;
-      } else {
-        // wrap to other direction
-        const otherList = activeWord.direction === 'across' ? downClues : acrossClues;
-        nextClue = otherList[otherList.length - 1];
-        nextDirection = activeWord.direction === 'across' ? 'down' : 'across';
-      }
+    const step = direction === 'next' ? 1 : -1;
+    let idx = (currentIdx + step + allClues.length) % allClues.length;
+    let attempts = 0;
+    while (
+      attempts < allClues.length &&
+      solvedClues.has(`${allClues[idx].direction}-${allClues[idx].number}`)
+    ) {
+      idx = (idx + step + allClues.length) % allClues.length;
+      attempts++;
     }
-    if (nextClue) handleClueSelect(nextClue.number, nextDirection);
-  }, [activeWord, puzzle, handleClueSelect]);
+    // If every clue is solved, fall back to simple next/prev without skipping
+    if (attempts === allClues.length) {
+      idx = (currentIdx + step + allClues.length) % allClues.length;
+    }
+    const next = allClues[idx];
+    handleClueSelect(next.number, next.direction);
+  }, [activeWord, puzzle, solvedClues, handleClueSelect]);
 
   return (
     <div className="solver-screen">
