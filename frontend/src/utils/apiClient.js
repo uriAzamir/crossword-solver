@@ -44,3 +44,35 @@ export async function checkHealth() {
     return { status: 'unreachable' };
   }
 }
+
+export async function fetchPuzzleList() {
+  let response;
+  try {
+    response = await fetch(`${BASE_URL}/puzzles`);
+  } catch {
+    throw new Error('לא ניתן להתחבר לשרת');
+  }
+  const data = await parseResponse(response);
+  if (!response.ok) throw new Error(data.message || `שגיאת שרת (${response.status})`);
+  return data;
+}
+
+export async function fetchPuzzle(id) {
+  let response;
+  try {
+    response = await fetch(`${BASE_URL}/puzzles/${id}`);
+  } catch {
+    throw new Error('לא ניתן להתחבר לשרת');
+  }
+  const data = await parseResponse(response);
+  if (!response.ok) throw new Error(data.message || `שגיאת שרת (${response.status})`);
+  return data;
+}
+
+export async function triggerSync() {
+  try {
+    await fetch(`${BASE_URL}/puzzles/sync`, { method: 'POST' });
+  } catch {
+    // Sync failures are non-fatal — server may be waking up
+  }
+}

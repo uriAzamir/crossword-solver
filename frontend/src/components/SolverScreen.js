@@ -17,6 +17,7 @@ function SolverScreen({
   onBackspace,
   onArrow,
   onNewPuzzle,
+  backLabel = 'העלה תשבץ חדש',
   onEditClue,
 }) {
 
@@ -152,7 +153,7 @@ function SolverScreen({
         />
 
         <button className="upload-new-btn" onClick={onNewPuzzle}>
-          העלה תשבץ חדש
+          {backLabel}
         </button>
       </div>
     </div>
