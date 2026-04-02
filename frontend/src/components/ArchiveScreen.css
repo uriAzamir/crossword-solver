@@ -72,6 +72,13 @@
   background: #f0f7ff;
 }
 
+.puzzle-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .puzzle-card-date {
   font-size: 0.8rem;
   color: #5a7d9a;
@@ -82,16 +89,33 @@
   font-size: 1rem;
   font-weight: 700;
   color: #1a3a55;
-  margin-bottom: 4px;
 }
 
-.puzzle-card-status {
-  font-size: 0.8rem;
-  color: #888;
+/* Mini crossword grid progress indicator */
+.mini-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 11px);
+  grid-template-rows: repeat(3, 11px);
+  gap: 2px;
+  flex-shrink: 0;
 }
 
-.puzzle-card-status:not(:empty) {
-  color: #5a9e6f;
+.mini-cell {
+  width: 11px;
+  height: 11px;
+}
+
+.mini-cell--black {
+  background: #2c3e50;
+}
+
+.mini-cell--filled {
+  background: #5b9bd5;
+}
+
+.mini-cell--empty {
+  background: #fff;
+  border: 1.5px solid #c8ddf0;
 }
 
 .archive-upload-btn {

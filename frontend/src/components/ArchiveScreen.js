@@ -17,15 +17,44 @@ function formatHebrewDate(isoString) {
   }
 }
 
+// 4 columns × 3 rows mini crossword grid.
+// Cells 1 and 10 are fixed "black" cells (rotationally symmetric) — purely decorative.
+// The remaining 10 cells fill in based on solving progress.
+const COLS = 4;
+const ROWS = 3;
+const BLACK = new Set([1, 10]);
+const OPEN_CELLS = COLS * ROWS - BLACK.size; // 10
+const ESTIMATED_TOTAL = 60; // typical open-cell count for these puzzles
+
+function MiniProgressGrid({ letterCount }) {
+  const filled = Math.round(Math.min(letterCount / ESTIMATED_TOTAL, 1) * OPEN_CELLS);
+  let openSeen = 0;
+  const cells = Array.from({ length: COLS * ROWS }, (_, i) => {
+    if (BLACK.has(i)) return 'black';
+    openSeen++;
+    return openSeen <= filled ? 'filled' : 'empty';
+  });
+
+  return (
+    <div className="mini-grid">
+      {cells.map((type, i) => (
+        <div key={i} className={`mini-cell mini-cell--${type}`} />
+      ))}
+    </div>
+  );
+}
+
 function PuzzleCard({ puzzle, onTap }) {
   const letterCount = getProgressCount(puzzle.id);
 
   return (
     <div className="puzzle-card" onClick={() => onTap(puzzle.id)}>
-      <div className="puzzle-card-date">{formatHebrewDate(puzzle.published_at)}</div>
-      <div className="puzzle-card-title">{puzzle.title}</div>
-      <div className="puzzle-card-status">
-        {letterCount > 0 ? `${letterCount} אותיות מולאו` : 'לא התחיל'}
+      <div className="puzzle-card-top">
+        <div>
+          <div className="puzzle-card-date">{formatHebrewDate(puzzle.published_at)}</div>
+          <div className="puzzle-card-title">{puzzle.title}</div>
+        </div>
+        <MiniProgressGrid letterCount={letterCount} />
       </div>
     </div>
   );
