@@ -29,24 +29,29 @@ function saveCache(puzzles) {
 export function useArchive() {
   const [puzzles, setPuzzles] = useState(loadCached);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [initialSyncDone, setInitialSyncDone] = useState(() => loadCached().length > 0);
+  const [fetchError, setFetchError] = useState(null);
 
   const refresh = useCallback(async () => {
     try {
       const list = await fetchPuzzleList();
       setPuzzles(list);
       saveCache(list);
-    } catch {
-      // keep showing cached list on error
+      setFetchError(null);
+    } catch (err) {
+      setFetchError(err.message || 'שגיאת חיבור');
     }
   }, []);
 
   const sync = useCallback(async () => {
     setIsSyncing(true);
+    setFetchError(null);
     try {
       await triggerSync();
       await refresh();
     } finally {
       setIsSyncing(false);
+      setInitialSyncDone(true);
     }
   }, [refresh]);
 
@@ -56,5 +61,5 @@ export function useArchive() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { puzzles, isSyncing, refresh, sync };
+  return { puzzles, isSyncing, initialSyncDone, fetchError, refresh, sync };
 }

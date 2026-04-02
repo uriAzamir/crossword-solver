@@ -32,7 +32,7 @@ function PuzzleCard({ puzzle, onTap }) {
 }
 
 function ArchiveScreen({ onOpenPuzzle, onManualUpload }) {
-  const { puzzles, isSyncing, sync } = useArchive();
+  const { puzzles, isSyncing, initialSyncDone, fetchError, sync } = useArchive();
 
   return (
     <div className="archive-screen">
@@ -48,8 +48,15 @@ function ArchiveScreen({ onOpenPuzzle, onManualUpload }) {
       )}
 
       <div className="archive-list">
-        {puzzles.length === 0 && !isSyncing && (
+        {puzzles.length === 0 && !isSyncing && !initialSyncDone && (
           <div className="archive-empty">טוען תשבצים...</div>
+        )}
+        {puzzles.length === 0 && !isSyncing && initialSyncDone && (
+          <div className="archive-empty">
+            {fetchError
+              ? `שגיאה: ${fetchError}. לחץ על "רענן" לנסות שוב.`
+              : 'לא נמצאו תשבצים. לחץ על "רענן" לנסות שוב.'}
+          </div>
         )}
         {puzzles.map(puzzle => (
           <PuzzleCard key={puzzle.id} puzzle={puzzle} onTap={onOpenPuzzle} />
