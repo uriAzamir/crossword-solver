@@ -7,3 +7,8 @@ pytesseract
 Pillow
 numpy
 gunicorn
+supabase
+requests
+beautifulsoup4
+lxml
+apscheduler

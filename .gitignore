@@ -1,5 +1,8 @@
 # Python
 backend/.env
+backend/scratch_*.py
+backend/scratch_*.html
+backend/scratch_puzzles/
 backend/__pycache__/
 backend/**/__pycache__/
 backend/*.pyc
