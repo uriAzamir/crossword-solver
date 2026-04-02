@@ -94,7 +94,7 @@
 /* Mini crossword grid progress indicator */
 .mini-grid {
   display: grid;
-  grid-template-columns: repeat(4, 11px);
+  grid-template-columns: repeat(3, 11px);
   grid-template-rows: repeat(3, 11px);
   gap: 2px;
   flex-shrink: 0;

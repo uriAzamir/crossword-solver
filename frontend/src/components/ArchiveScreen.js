@@ -20,10 +20,10 @@ function formatHebrewDate(isoString) {
 // 4 columns × 3 rows mini crossword grid.
 // Cells 1 and 10 are fixed "black" cells (rotationally symmetric) — purely decorative.
 // The remaining 10 cells fill in based on solving progress.
-const COLS = 4;
+const COLS = 3;
 const ROWS = 3;
-const BLACK = new Set([1, 10]);
-const OPEN_CELLS = COLS * ROWS - BLACK.size; // 10
+const BLACK = new Set([2, 6]);
+const OPEN_CELLS = COLS * ROWS - BLACK.size; // 7
 const ESTIMATED_TOTAL = 60; // typical open-cell count for these puzzles
 
 function MiniProgressGrid({ letterCount }) {
