@@ -22,8 +22,8 @@ function formatHebrewDate(isoString) {
 // The remaining 10 cells fill in based on solving progress.
 const COLS = 4;
 const ROWS = 4;
-// Diagonal scatter — rotationally symmetric, looks like a real crossword
-const BLACK = new Set([3, 6, 9, 12]);
+// Scattered pattern — rotationally symmetric, mimics real crossword black cells
+const BLACK = new Set([2, 4, 11, 13]);
 const OPEN_CELLS = COLS * ROWS - BLACK.size; // 12
 const ESTIMATED_TOTAL = 60; // typical open-cell count for these puzzles
 
