@@ -35,6 +35,26 @@ def extract_grid(grid_region: np.ndarray) -> dict:
         grid_region = grid_region[:, x_crop:]
         w -= x_crop
 
+    # Trim whitespace above/below the grid's outer border using the same logic.
+    # A real grid border row is a dense horizontal line (>40% of width dark).
+    # A white strip has almost no dark pixels and would otherwise be misread as a row.
+    row_dark = np.sum(binary == 0, axis=1)
+    y_top = 0
+    for y in range(h):
+        if row_dark[y] >= w * 0.4:
+            y_top = y
+            break
+    y_bottom = h
+    for y in range(h - 1, -1, -1):
+        if row_dark[y] >= w * 0.4:
+            y_bottom = y + 1
+            break
+    if y_top > 0 or y_bottom < h:
+        gray = gray[y_top:y_bottom, :]
+        binary = binary[y_top:y_bottom, :]
+        grid_region = grid_region[y_top:y_bottom, :]
+        h = y_bottom - y_top
+
     # Detect grid lines on the full region (no bounding box pre-crop)
     row_lines, col_lines = _detect_grid_lines(gray, binary, h, w)
 
