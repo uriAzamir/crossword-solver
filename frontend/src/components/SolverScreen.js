@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import CrosswordGrid from './CrosswordGrid';
 import ClueDisplay from './ClueDisplay';
 import ClueList from './ClueList';
@@ -23,6 +23,7 @@ function SolverScreen({
 }) {
 
   const contentRef = useRef(null);
+  const [showImage, setShowImage] = useState(false);
 
   const solvedClues = useMemo(() => {
     if (!puzzle) return new Set();
@@ -154,7 +155,7 @@ function SolverScreen({
         />
 
         {imageUrl && (
-          <button className="upload-new-btn" onClick={() => window.open(imageUrl, '_blank')}>
+          <button className="upload-new-btn" onClick={() => setShowImage(true)}>
             צפה בתמונה המקורית
           </button>
         )}
@@ -162,6 +163,17 @@ function SolverScreen({
           {backLabel}
         </button>
       </div>
+      {showImage && (
+        <div className="image-overlay" onClick={() => setShowImage(false)}>
+          <button className="image-overlay-close" onClick={() => setShowImage(false)}>✕</button>
+          <img
+            src={imageUrl}
+            alt="תמונה מקורית"
+            className="image-overlay-img"
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
