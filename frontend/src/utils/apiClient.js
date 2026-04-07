@@ -69,6 +69,14 @@ export async function fetchPuzzle(id) {
   return data;
 }
 
+export async function updatePuzzleClues(id, clues) {
+  await fetch(`${BASE_URL}/puzzles/${id}/clues`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ clues }),
+  });
+}
+
 export async function triggerSync() {
   try {
     await fetch(`${BASE_URL}/puzzles/sync`, { method: 'POST' });

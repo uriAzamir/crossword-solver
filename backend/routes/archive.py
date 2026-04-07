@@ -2,7 +2,7 @@ import os
 import logging
 import threading
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from supabase import create_client
 
 logger = logging.getLogger(__name__)
@@ -61,3 +61,26 @@ def get_puzzle(puzzle_id):
     if not result.data:
         return jsonify({'error': 'not_found'}), 404
     return jsonify(result.data)
+
+
+@archive_bp.route('/puzzles/<puzzle_id>/clues', methods=['PATCH'])
+def update_clues(puzzle_id):
+    data = request.get_json()
+    if not data or 'clues' not in data:
+        return jsonify({'error': 'clues required'}), 400
+
+    db = _get_supabase()
+    result = (
+        db.table('puzzles')
+        .select('processed_data')
+        .eq('id', puzzle_id)
+        .single()
+        .execute()
+    )
+    if not result.data:
+        return jsonify({'error': 'not_found'}), 404
+
+    processed_data = result.data['processed_data']
+    processed_data['clues'] = data['clues']
+    db.table('puzzles').update({'processed_data': processed_data}).eq('id', puzzle_id).execute()
+    return jsonify({'ok': True})

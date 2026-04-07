@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import UploadScreen from './components/UploadScreen';
 import ProcessingScreen from './components/ProcessingScreen';
 import SolverScreen from './components/SolverScreen';
 import ArchiveScreen from './components/ArchiveScreen';
 import { usePuzzleState } from './hooks/usePuzzleState';
 import { loadProgress, saveProgress } from './hooks/usePuzzleProgress';
-import { fetchPuzzle } from './utils/apiClient';
+import { fetchPuzzle, updatePuzzleClues } from './utils/apiClient';
 import './App.css';
 
 function App() {
@@ -78,6 +78,19 @@ function App() {
     setScreen('upload');
   };
 
+  const handleEditClue = useCallback((direction, number, newText) => {
+    editClue(direction, number, newText);
+    if (activePuzzleId && puzzle) {
+      const newClues = {
+        ...puzzle.clues,
+        [direction]: puzzle.clues[direction].map(c =>
+          c.number === number ? { ...c, text: newText } : c
+        ),
+      };
+      updatePuzzleClues(activePuzzleId, newClues).catch(() => {});
+    }
+  }, [editClue, activePuzzleId, puzzle]);
+
   const activeWord = getActiveWord();
 
   return (
@@ -117,7 +130,7 @@ function App() {
           onArrow={handleArrow}
           onNewPuzzle={activePuzzleId ? handleBackToArchive : handleManualUpload}
           backLabel={activePuzzleId ? 'חזור לארכיון' : 'העלה תשבץ חדש'}
-          onEditClue={editClue}
+          onEditClue={handleEditClue}
           imageUrl={activePuzzleImageUrl}
         />
       )}
