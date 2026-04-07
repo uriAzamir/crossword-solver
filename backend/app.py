@@ -41,7 +41,9 @@ def _start_scheduler():
     from services.scraper import fetch_new_puzzles
 
     scheduler = BackgroundScheduler(timezone='Asia/Jerusalem')
-    scheduler.add_job(fetch_new_puzzles, 'cron', day_of_week='mon,wed', hour=9, minute=0)
+    # Check on puzzle days: 9 AM, 1 PM, 5 PM, 9 PM, then midnight (start of Tue/Thu) as end-of-day sweep
+    scheduler.add_job(fetch_new_puzzles, 'cron', day_of_week='mon,wed', hour='9,13,17,21', minute=0)
+    scheduler.add_job(fetch_new_puzzles, 'cron', day_of_week='tue,thu', hour=0, minute=0)
     scheduler.start()
 
     # Catch-up: run once on startup in background to pick up any missed posts

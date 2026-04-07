@@ -19,6 +19,7 @@ function SolverScreen({
   onNewPuzzle,
   backLabel = 'העלה תשבץ חדש',
   onEditClue,
+  imageUrl,
 }) {
 
   const contentRef = useRef(null);
@@ -152,6 +153,11 @@ function SolverScreen({
           onEditClue={onEditClue}
         />
 
+        {imageUrl && (
+          <button className="upload-new-btn" onClick={() => window.open(imageUrl, '_blank')}>
+            צפה בתמונה המקורית
+          </button>
+        )}
         <button className="upload-new-btn" onClick={onNewPuzzle}>
           {backLabel}
         </button>

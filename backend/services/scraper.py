@@ -79,6 +79,8 @@ def fetch_new_puzzles() -> dict:
             errors.append({'title': post.get('title', '?'), 'error': str(e)})
 
     logger.info(f'Sync complete: {new_count} new, {len(errors)} errors')
+    if errors:
+        _send_error_email(errors)
     return {'new_count': new_count, 'errors': errors}
 
 
@@ -209,6 +211,39 @@ def _upload_image(db, image_bytes: bytes, post_id: str) -> tuple[str, str]:
     )
     public_url = db.storage.from_('puzzle-images').get_public_url(storage_path)
     return storage_path, public_url
+
+
+def _send_error_email(errors: list):
+    """Send an email notification when one or more puzzles fail to process."""
+    import smtplib
+    from email.mime.text import MIMEText
+
+    smtp_host = os.getenv('SMTP_HOST', 'smtp.gmail.com')
+    smtp_port = int(os.getenv('SMTP_PORT', '587'))
+    smtp_user = os.getenv('SMTP_USER')
+    smtp_password = os.getenv('SMTP_PASSWORD')
+    notify_email = os.getenv('NOTIFY_EMAIL')
+
+    if not all([smtp_user, smtp_password, notify_email]):
+        logger.warning('Error email skipped: SMTP_USER, SMTP_PASSWORD, or NOTIFY_EMAIL not set')
+        return
+
+    lines = '\n'.join(f'- {e["title"]}: {e["error"]}' for e in errors)
+    body = f'The following crossword puzzle(s) failed to upload:\n\n{lines}'
+
+    msg = MIMEText(body, 'plain', 'utf-8')
+    msg['Subject'] = f'Crossword solver: {len(errors)} puzzle(s) failed to upload'
+    msg['From'] = smtp_user
+    msg['To'] = notify_email
+
+    try:
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+            server.send_message(msg)
+        logger.info(f'Error notification sent to {notify_email}')
+    except Exception as e:
+        logger.error(f'Failed to send error notification email: {e}')
 
 
 def _insert_puzzle(db, post: dict, storage_path: str, public_url: str, processed_data: dict):

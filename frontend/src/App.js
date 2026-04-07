@@ -11,6 +11,7 @@ import './App.css';
 function App() {
   const [screen, setScreen] = useState('archive');
   const [activePuzzleId, setActivePuzzleId] = useState(null);
+  const [activePuzzleImageUrl, setActivePuzzleImageUrl] = useState(null);
   const [uploadError, setUploadError] = useState('');
 
   const {
@@ -45,6 +46,7 @@ function App() {
       const data = await fetchPuzzle(puzzleId);
       const saved = loadProgress(puzzleId);
       setActivePuzzleId(puzzleId);
+      setActivePuzzleImageUrl(data.image_public_url || null);
       loadPuzzle(data.processed_data, saved);
       setScreen('solver');
     } catch {
@@ -54,6 +56,7 @@ function App() {
 
   const handleBackToArchive = () => {
     setActivePuzzleId(null);
+    setActivePuzzleImageUrl(null);
     newPuzzle();
     setScreen('archive');
   };
@@ -115,6 +118,7 @@ function App() {
           onNewPuzzle={activePuzzleId ? handleBackToArchive : handleManualUpload}
           backLabel={activePuzzleId ? 'חזור לארכיון' : 'העלה תשבץ חדש'}
           onEditClue={editClue}
+          imageUrl={activePuzzleImageUrl}
         />
       )}
     </div>
