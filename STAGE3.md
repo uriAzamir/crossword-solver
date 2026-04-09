@@ -1,4 +1,13 @@
-# Stage 3 — Multi-User Support (Plan)
+# Stage 3 — Multi-User Support (Complete)
+
+## What Was Actually Built (vs. Plan)
+
+All planned steps were implemented. The following were added beyond the original plan:
+
+- **PWA support** — web app manifest, iOS meta tags, crossword-grid app icon, safe-area insets; app installs to iPhone home screen and runs without browser UI
+- **Loading screen differentiation** — "טוען תשבץ..." when opening from archive vs "מעבד תמונה..." for manual uploads
+- **App renamed** — title changed to "המשבצת" throughout (login screen, archive header, manifest, browser tab)
+- **Supabase RLS** — Row Level Security enabled on all tables with public-read policies; all writes protected (service key only)
 
 ## Goal
 
