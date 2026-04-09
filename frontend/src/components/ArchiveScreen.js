@@ -69,7 +69,7 @@ function ArchiveScreen({ onOpenPuzzle, onManualUpload, currentUser, onLogout, ge
     <div className="archive-screen">
       <div className="archive-header">
         <div className="archive-header-right">
-          <span className="archive-title">דקל בנו</span>
+          <span className="archive-title">המשבצת</span>
           {currentUser && (
             <span className="archive-user">
               שלום, {currentUser.username}

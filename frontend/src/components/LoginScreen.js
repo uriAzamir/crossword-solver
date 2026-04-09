@@ -87,7 +87,7 @@ function LoginScreen({ onLogin }) {
   if (mode === 'login' || mode === 'create') {
     return (
       <div className="login-screen">
-        <div className="login-title">דקל בנו</div>
+        <div className="login-title">המשבצת</div>
         <div className="login-subtitle">
           {mode === 'login' ? 'כניסה עם שם משתמש קיים' : 'יצירת משתמש חדש'}
         </div>
@@ -98,7 +98,7 @@ function LoginScreen({ onLogin }) {
 
   return (
     <div className="login-screen">
-      <div className="login-title">דקל בנו</div>
+      <div className="login-title">המשבצת</div>
       <div className="login-subtitle">ברוך הבא</div>
       <div className="login-options">
         <button className="login-btn login-btn--primary" onClick={() => setMode('login')}>
