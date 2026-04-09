@@ -15,6 +15,7 @@ function App() {
   const [activePuzzleId, setActivePuzzleId] = useState(null);
   const [activePuzzleImageUrl, setActivePuzzleImageUrl] = useState(null);
   const [uploadError, setUploadError] = useState('');
+  const [processingMode, setProcessingMode] = useState('upload');
   const [allProgress, setAllProgress] = useState({});
 
   const { currentUser, setCurrentUser } = useCurrentUser();
@@ -67,6 +68,7 @@ function App() {
 
   // Open a puzzle from the archive
   const handleOpenArchivePuzzle = async (puzzleId) => {
+    setProcessingMode('load');
     setScreen('processing');
     try {
       const data = await fetchPuzzle(puzzleId);
@@ -164,7 +166,7 @@ function App() {
       {screen === 'upload' && (
         <UploadScreen
           onPuzzleLoaded={handlePuzzleLoaded}
-          onProcessingStart={() => { setUploadError(''); setScreen('processing'); }}
+          onProcessingStart={() => { setUploadError(''); setProcessingMode('upload'); setScreen('processing'); }}
           onProcessingError={handleProcessingError}
           initialError={uploadError}
           hasSavedPuzzle={hasSavedPuzzle}
@@ -176,7 +178,7 @@ function App() {
           }}
         />
       )}
-      {screen === 'processing' && <ProcessingScreen />}
+      {screen === 'processing' && <ProcessingScreen mode={processingMode} />}
       {screen === 'solver' && puzzle && (
         <SolverScreen
           puzzle={puzzle}
