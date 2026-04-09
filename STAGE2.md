@@ -1,4 +1,4 @@
-# Stage 2 — Automatic Puzzle Fetching from Google Group (Plan)
+# Stage 2 — Automatic Puzzle Fetching from Google Group (Complete)
 
 ## Goal
 
@@ -9,6 +9,16 @@ Extend the app to automatically fetch new Hebrew crossword puzzles from a public
 **Attachment needed:** PNG only (each post also has a PDF)
 
 ---
+
+## What Was Actually Built (vs. Plan)
+
+All 8 planned steps were implemented. The following were added beyond the original plan:
+
+- **Multiple scheduled sync times** — scraper runs 5 times on puzzle days (9 AM, 1 PM, 5 PM, 9 PM, midnight Tue/Thu) instead of once at 9 AM, to catch late uploads
+- **Email error notifications** — when a puzzle fails to process, an email is sent (configurable via `SMTP_*` env vars)
+- **Clue editing + persistence** — pencil button in clue list lets users fix extraction mistakes; edits are saved back to Supabase (`PATCH /api/puzzles/<id>/clues`)
+- **View original image overlay** — "צפה בתמונה המקורית" button in the solver opens the original Supabase-stored image in an in-app overlay
+- **`reprocess_all.py`** — standalone script to re-run extraction on all stored puzzles after algorithm improvements
 
 ## Implementation Steps
 

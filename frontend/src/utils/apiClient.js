@@ -77,6 +77,47 @@ export async function updatePuzzleClues(id, clues) {
   });
 }
 
+export async function createUser(username) {
+  const response = await fetch(`${BASE_URL}/users`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username }),
+  });
+  const data = await parseResponse(response);
+  if (!response.ok) throw Object.assign(new Error(data.error || 'שגיאת שרת'), { status: response.status });
+  return data;
+}
+
+export async function getUserByName(username) {
+  const response = await fetch(`${BASE_URL}/users/by-name/${encodeURIComponent(username)}`);
+  const data = await parseResponse(response);
+  if (!response.ok) throw Object.assign(new Error(data.error || 'שגיאת שרת'), { status: response.status });
+  return data;
+}
+
+export async function fetchUserProgress(userId) {
+  const response = await fetch(`${BASE_URL}/users/${userId}/progress`);
+  const data = await parseResponse(response);
+  if (!response.ok) throw new Error(data.error || 'שגיאת שרת');
+  return data;
+}
+
+export async function saveUserProgress(userId, puzzleId, letters) {
+  await fetch(`${BASE_URL}/users/${userId}/progress/${puzzleId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ letters }),
+  });
+}
+
+export async function bulkImportProgress(userId, entries) {
+  await fetch(`${BASE_URL}/users/${userId}/progress/bulk`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(entries),
+  });
+}
+
 export async function triggerSync() {
   try {
     await fetch(`${BASE_URL}/puzzles/sync`, { method: 'POST' });

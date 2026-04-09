@@ -2,6 +2,11 @@
 
 Mobile-first web app for solving Hebrew cryptic crossword puzzles. Upload a puzzle image → get an interactive solving grid.
 
+## Stage Status
+- **Stage 1** (Complete) — Manual image upload, grid/clue extraction, interactive solver. See `STAGE1.md`.
+- **Stage 2** (Complete) — Automatic puzzle fetching from Google Group, Supabase archive, clue editing, error notifications. See `STAGE2.md`.
+- **Stage 3** (In Progress) — Multi-user support with per-user progress. See `STAGE3.md`.
+
 ## Architecture
 
 - **Frontend**: React (CRA), mobile-first, RTL Hebrew layout

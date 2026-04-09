@@ -19,8 +19,10 @@ CORS(app, origins=_origins)
 
 from routes.puzzle import puzzle_bp
 from routes.archive import archive_bp
+from routes.users import users_bp
 app.register_blueprint(puzzle_bp, url_prefix='/api')
 app.register_blueprint(archive_bp, url_prefix='/api')
+app.register_blueprint(users_bp, url_prefix='/api')
 
 
 @app.route('/api/health')

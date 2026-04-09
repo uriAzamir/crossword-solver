@@ -3,9 +3,11 @@ import UploadScreen from './components/UploadScreen';
 import ProcessingScreen from './components/ProcessingScreen';
 import SolverScreen from './components/SolverScreen';
 import ArchiveScreen from './components/ArchiveScreen';
+import LoginScreen from './components/LoginScreen';
 import { usePuzzleState } from './hooks/usePuzzleState';
-import { loadProgress, saveProgress } from './hooks/usePuzzleProgress';
-import { fetchPuzzle, updatePuzzleClues } from './utils/apiClient';
+import { useCurrentUser } from './hooks/useCurrentUser';
+import { loadProgress, saveProgress, getProgressCount, loadProgressFromServer, saveProgressToServer } from './hooks/usePuzzleProgress';
+import { fetchPuzzle, updatePuzzleClues, fetchUserProgress } from './utils/apiClient';
 import './App.css';
 
 function App() {
@@ -13,6 +15,10 @@ function App() {
   const [activePuzzleId, setActivePuzzleId] = useState(null);
   const [activePuzzleImageUrl, setActivePuzzleImageUrl] = useState(null);
   const [uploadError, setUploadError] = useState('');
+  const [allProgress, setAllProgress] = useState({});
+
+  const { currentUser, setCurrentUser } = useCurrentUser();
+  const isLoggedIn = currentUser !== null; // null = guest, {id, username} = logged in
 
   const {
     puzzle,
@@ -32,19 +38,42 @@ function App() {
     editClue,
   } = usePuzzleState();
 
-  // Save progress to per-puzzle key whenever letters change in archive flow
+  // Load all progress for the current user when they log in (for archive mini grids)
   useEffect(() => {
-    if (activePuzzleId && letters && Object.keys(letters).length > 0) {
+    if (!currentUser) {
+      // Guest: build progress map from localStorage
+      setAllProgress({});
+      return;
+    }
+    fetchUserProgress(currentUser.id)
+      .then(data => {
+        const counts = Object.fromEntries(
+          Object.entries(data).map(([pid, p]) => [pid, Object.keys(p.letters || {}).length])
+        );
+        setAllProgress(counts);
+      })
+      .catch(() => setAllProgress({}));
+  }, [currentUser]);
+
+  // Save progress whenever letters change while solving an archive puzzle
+  useEffect(() => {
+    if (!activePuzzleId || !letters || Object.keys(letters).length === 0) return;
+    if (currentUser) {
+      saveProgressToServer(currentUser.id, activePuzzleId, letters);
+      setAllProgress(prev => ({ ...prev, [activePuzzleId]: Object.keys(letters).length }));
+    } else {
       saveProgress(activePuzzleId, letters);
     }
-  }, [letters, activePuzzleId]);
+  }, [letters, activePuzzleId, currentUser]);
 
   // Open a puzzle from the archive
   const handleOpenArchivePuzzle = async (puzzleId) => {
     setScreen('processing');
     try {
       const data = await fetchPuzzle(puzzleId);
-      const saved = loadProgress(puzzleId);
+      const saved = currentUser
+        ? await loadProgressFromServer(currentUser.id, puzzleId)
+        : loadProgress(puzzleId);
       setActivePuzzleId(puzzleId);
       setActivePuzzleImageUrl(data.image_public_url || null);
       loadPuzzle(data.processed_data, saved);
@@ -91,7 +120,36 @@ function App() {
     }
   }, [editClue, activePuzzleId, puzzle]);
 
+  const handleLogin = (user) => {
+    // user is {id, username} or null (guest)
+    setCurrentUser(user);
+    setScreen('archive');
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(undefined); // undefined triggers login screen
+    setAllProgress({});
+    setActivePuzzleId(null);
+    newPuzzle();
+    setScreen('archive');
+  };
+
+  // Get progress count for a puzzle (guest falls back to localStorage)
+  const getProgress = useCallback((puzzleId) => {
+    if (currentUser) return allProgress[puzzleId] ?? 0;
+    return getProgressCount(puzzleId);
+  }, [currentUser, allProgress]);
+
   const activeWord = getActiveWord();
+
+  // Show login screen if no user has been chosen yet
+  if (currentUser === undefined) {
+    return (
+      <div className="app">
+        <LoginScreen onLogin={handleLogin} />
+      </div>
+    );
+  }
 
   return (
     <div className="app">
@@ -99,6 +157,9 @@ function App() {
         <ArchiveScreen
           onOpenPuzzle={handleOpenArchivePuzzle}
           onManualUpload={handleManualUpload}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+          getProgress={getProgress}
         />
       )}
       {screen === 'upload' && (

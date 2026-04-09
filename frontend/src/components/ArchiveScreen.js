@@ -1,6 +1,5 @@
 import React from 'react';
 import { useArchive } from '../hooks/useArchive';
-import { getProgressCount } from '../hooks/usePuzzleProgress';
 import './ArchiveScreen.css';
 
 function formatHebrewDate(isoString) {
@@ -47,8 +46,8 @@ function MiniProgressGrid({ letterCount }) {
   );
 }
 
-function PuzzleCard({ puzzle, onTap }) {
-  const letterCount = getProgressCount(puzzle.id);
+function PuzzleCard({ puzzle, onTap, getProgress }) {
+  const letterCount = getProgress(puzzle.id);
 
   return (
     <div className="puzzle-card" onClick={() => onTap(puzzle.id)}>
@@ -63,13 +62,24 @@ function PuzzleCard({ puzzle, onTap }) {
   );
 }
 
-function ArchiveScreen({ onOpenPuzzle, onManualUpload }) {
+function ArchiveScreen({ onOpenPuzzle, onManualUpload, currentUser, onLogout, getProgress }) {
   const { puzzles, isSyncing, initialSyncDone, fetchError, sync } = useArchive();
 
   return (
     <div className="archive-screen">
       <div className="archive-header">
-        <span className="archive-title">דקל בנו</span>
+        <div className="archive-header-right">
+          <span className="archive-title">דקל בנו</span>
+          {currentUser && (
+            <span className="archive-user">
+              שלום, {currentUser.username}
+              <button className="archive-logout-btn" onClick={onLogout}>החלף משתמש</button>
+            </span>
+          )}
+          {!currentUser && (
+            <button className="archive-logout-btn" onClick={onLogout}>החלף משתמש</button>
+          )}
+        </div>
         <button className="archive-refresh-btn" onClick={sync} disabled={isSyncing}>
           {isSyncing ? '...' : 'רענן'}
         </button>
@@ -91,7 +101,7 @@ function ArchiveScreen({ onOpenPuzzle, onManualUpload }) {
           </div>
         )}
         {puzzles.map(puzzle => (
-          <PuzzleCard key={puzzle.id} puzzle={puzzle} onTap={onOpenPuzzle} />
+          <PuzzleCard key={puzzle.id} puzzle={puzzle} onTap={onOpenPuzzle} getProgress={getProgress} />
         ))}
       </div>
 
