@@ -18,7 +18,6 @@ function App() {
   const [allProgress, setAllProgress] = useState({});
 
   const { currentUser, setCurrentUser } = useCurrentUser();
-  const isLoggedIn = currentUser !== null; // null = guest, {id, username} = logged in
 
   const {
     puzzle,
