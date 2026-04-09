@@ -149,7 +149,6 @@
   display: block;
   width: 100%;
   padding: 16px;
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
   background: #e8f0f8;
   color: #2c5f8a;
   border: none;
@@ -164,4 +163,13 @@
 
 .archive-upload-btn:active {
   background: #d0e4f4;
+}
+
+/* Fill the iPhone home-indicator gap with the same colour as the button */
+.archive-screen::after {
+  content: '';
+  display: block;
+  height: env(safe-area-inset-bottom);
+  background: #e8f0f8;
+  flex-shrink: 0;
 }
