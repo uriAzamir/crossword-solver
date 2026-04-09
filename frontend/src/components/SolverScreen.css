@@ -41,13 +41,8 @@
   background: #d0e4f4;
 }
 
-/* Fill the iPhone home-indicator gap with the same colour as the button */
-.solver-content::after {
-  content: '';
-  display: block;
-  height: env(safe-area-inset-bottom);
-  background: #e8f0f8;
-  flex-shrink: 0;
+.upload-new-btn:last-child {
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
 }
 
 .solver-content {
