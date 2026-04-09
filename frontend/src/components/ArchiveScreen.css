@@ -149,6 +149,7 @@
   display: block;
   width: 100%;
   padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
   background: #e8f0f8;
   color: #2c5f8a;
   border: none;

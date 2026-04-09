@@ -11,7 +11,6 @@ html, body, #root {
   padding: 0;
   overflow: hidden;
   overscroll-behavior: none;
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 body {
