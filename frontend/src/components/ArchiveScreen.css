@@ -11,6 +11,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
+  padding-top: calc(14px + env(safe-area-inset-top));
   background: #f0f7ff;
   border-bottom: 2px solid #5b9bd5;
   flex-shrink: 0;
