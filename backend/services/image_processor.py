@@ -59,20 +59,14 @@ def _find_title_bar_bottom(img: np.ndarray) -> int:
     row_sums = np.sum(mask, axis=1)
     threshold = w * 0.1 * 255  # at least 10% of row width is blue
 
-    # Walk down until the first blue row, then continue until blue ends
-    in_blue = False
-    end_of_first_band = 0
+    # Find the last blue row in the search zone (covers multiple stacked header bars)
+    last_blue_row = 0
     for i, s in enumerate(row_sums):
-        is_blue = s > threshold
-        if is_blue:
-            in_blue = True
-            end_of_first_band = i
-        elif in_blue:
-            # Blue band ended — stop here
-            return end_of_first_band + 1
+        if s > threshold:
+            last_blue_row = i
 
-    if end_of_first_band > 0:
-        return end_of_first_band + 1
+    if last_blue_row > 0:
+        return last_blue_row + 1
 
     # Fallback: fixed 10%
     return int(h * 0.10)

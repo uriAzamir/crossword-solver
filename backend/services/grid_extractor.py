@@ -152,8 +152,11 @@ def _hough_lines(gray, h, w):
             elif dy > 0 and dx < dy * 0.2:
                 v_positions.append((x1 + x2) // 2)
 
-    row_lines = _cluster_lines(sorted(h_positions), tolerance=8)
-    col_lines = _cluster_lines(sorted(v_positions), tolerance=8)
+    # Tolerance proportional to image size so thick lines in hi-res images
+    # don't generate duplicate detections (both edges of a thick line cluster together)
+    line_tolerance = max(8, int(min_dim * 0.02))
+    row_lines = _cluster_lines(sorted(h_positions), tolerance=line_tolerance)
+    col_lines = _cluster_lines(sorted(v_positions), tolerance=line_tolerance)
 
     row_lines = _add_boundaries(row_lines, h)
     col_lines = _add_boundaries(col_lines, w)
@@ -214,12 +217,12 @@ def _regularize_lines(lines):
 
     result = list(lines)
 
-    # Remove small leading interval (e.g. outer border edge + inner face both detected)
-    if (result[1] - result[0]) <= small_threshold:
+    # Remove small leading intervals (loop: outer border may generate multiple close lines)
+    while len(result) >= 2 and (result[1] - result[0]) <= small_threshold:
         result = result[1:]
 
-    # Remove small trailing interval
-    if len(result) >= 2 and (result[-1] - result[-2]) <= small_threshold:
+    # Remove small trailing intervals (loop: artifact strips may stack at the edge)
+    while len(result) >= 2 and (result[-1] - result[-2]) <= small_threshold:
         result = result[:-1]
 
     # Insert lines for large gaps (missed interior lines)
