@@ -36,34 +36,43 @@ def process_image(image_bytes: bytes) -> dict:
 
 def _find_title_bar_bottom(img: np.ndarray) -> int:
     """
-    Detect the bottom edge of all header bars at the top of the image.
+    Detect the bottom edge of the header bar(s) at the very top of the image.
     Handles both light-blue (standard format) and dark-blue (alternative
     format such as ידיעות אחרונות) title/subtitle bars.
-    Only scans the top 30% of the image to avoid false positives.
+
+    Strategy: find the end of the first contiguous blue region starting from
+    the top. This avoids being fooled by a second blue band lower in the image
+    (e.g. a blue background in the clue area).
+
     Falls back to 10% of image height if no blue is detected.
     """
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     h, w = img.shape[:2]
 
-    # Scan only the top 30% for header bars
-    search_h = int(h * 0.30)
-
-    # Blue family: hue ~90-130 (OpenCV 0-179), any saturation/value
-    # Value floor of 50 catches dark navy bars as well as light-blue ones
+    # Blue family: hue ~90-130 (OpenCV 0-179), value floor 50 catches dark navy
     lower_blue = np.array([90, 60, 50])
     upper_blue = np.array([130, 255, 255])
-    mask = cv2.inRange(hsv[:search_h], lower_blue, upper_blue)
 
+    # Only scan the top 30% for header bars
+    search_h = int(h * 0.30)
+    mask = cv2.inRange(hsv[:search_h], lower_blue, upper_blue)
     row_sums = np.sum(mask, axis=1)
     threshold = w * 0.1 * 255  # at least 10% of row width is blue
 
-    last_blue_row = 0
+    # Walk down until the first blue row, then continue until blue ends
+    in_blue = False
+    end_of_first_band = 0
     for i, s in enumerate(row_sums):
-        if s > threshold:
-            last_blue_row = i
+        is_blue = s > threshold
+        if is_blue:
+            in_blue = True
+            end_of_first_band = i
+        elif in_blue:
+            # Blue band ended — stop here
+            return end_of_first_band + 1
 
-    if last_blue_row > 0:
-        return last_blue_row + 1
+    if end_of_first_band > 0:
+        return end_of_first_band + 1
 
     # Fallback: fixed 10%
     return int(h * 0.10)
