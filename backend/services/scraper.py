@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 BASE = 'https://groups.google.com'
 GROUP = 'tartey_mashma'
 IMAGE_EXTS = ('.jpg', '.jpeg', '.png')
-TITLE_PREFIXES = ('דקל בנו שני', 'דקל בנו רביעי')
+TITLE_KEYWORD = 'דקל בנו'
+TITLE_EXCLUDE = 'לאישה'
 
 HEADERS = {
     'User-Agent': (
@@ -86,71 +87,100 @@ def fetch_new_puzzles() -> dict:
 
 def _search_posts() -> list[dict]:
     """
-    Search the Google Group for posts matching either title prefix.
+    Search the Google Group for posts containing 'דקל בנו', excluding 'לאישה'.
     Returns a deduplicated list of post dicts keyed by thread ID.
     """
     posts = {}
 
-    for prefix in TITLE_PREFIXES:
-        url = f'{BASE}/g/{GROUP}/search?q={quote(prefix)}'
-        try:
-            r = requests.get(url, headers=HEADERS, timeout=20)
-            r.raise_for_status()
-        except requests.RequestException as e:
-            logger.error(f'Search request failed for "{prefix}": {e}')
+    url = f'{BASE}/g/{GROUP}/search?q={quote(TITLE_KEYWORD)}'
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=20)
+        r.raise_for_status()
+    except requests.RequestException as e:
+        logger.error(f'Search request failed for "{TITLE_KEYWORD}": {e}')
+        return []
+
+    soup = BeautifulSoup(r.text, 'lxml')
+
+    for a in soup.find_all('a', href=True):
+        href = a['href']
+        text = a.get_text(strip=True)
+
+        if '/c/' not in href or GROUP not in href:
             continue
 
-        soup = BeautifulSoup(r.text, 'lxml')
+        # Must contain keyword; skip excluded titles
+        if TITLE_KEYWORD not in text or TITLE_EXCLUDE in text:
+            continue
 
-        for a in soup.find_all('a', href=True):
-            href = a['href']
-            text = a.get_text(strip=True)
+        # Extract thread ID from ./g/tartey_mashma/c/{thread_id}/m/{msg_id}
+        match = re.search(r'/c/([^/]+)', href)
+        if not match:
+            continue
+        thread_id = match.group(1)
 
-            if '/c/' not in href or GROUP not in href:
-                continue
+        if thread_id in posts:
+            continue
 
-            # Only keep links whose visible text starts with a known prefix
-            if not any(text.startswith(p) for p in TITLE_PREFIXES):
-                continue
+        # Normalize the post URL (strip leading ./ if relative)
+        if href.startswith('./'):
+            href = href[2:]
+        post_url = BASE + '/' + href.lstrip('/')
 
-            # Extract thread ID from ./g/tartey_mashma/c/{thread_id}/m/{msg_id}
-            match = re.search(r'/c/([^/]+)', href)
-            if not match:
-                continue
-            thread_id = match.group(1)
+        title = _extract_title(text)
+        published_at = _parse_date(title)
+        day_of_week = _day_of_week(title, published_at)
 
-            if thread_id in posts:
-                continue
+        # Only keep puzzles posted on Monday or Wednesday
+        if day_of_week not in ('monday', 'wednesday'):
+            logger.debug(f'Skipping non-Monday/Wednesday post: {title}')
+            continue
 
-            # Normalize the post URL (strip leading ./ if relative)
-            if href.startswith('./'):
-                href = href[2:]
-            post_url = BASE + '/' + href.lstrip('/')
-
-            # Extract clean title: just the "דקל בנו שני DD.MM.YY" part
-            title = _extract_title(text)
-
-            posts[thread_id] = {
-                'post_id': thread_id,
-                'post_url': post_url,
-                'title': title,
-                'day_of_week': 'monday' if 'שני' in title else 'wednesday',
-                'published_at': _parse_date(title),
-            }
+        posts[thread_id] = {
+            'post_id': thread_id,
+            'post_url': post_url,
+            'title': title,
+            'day_of_week': day_of_week,
+            'published_at': published_at,
+        }
 
     return list(posts.values())
 
 
 def _extract_title(text: str) -> str:
     """
-    Extract just the 'דקל בנו שני/רביעי DD.MM.YY(YY)' part from a
-    search result snippet (which appends the message body after the title).
+    Extract the title line from a search result snippet.
+    Tries to capture everything up to (and including) the date.
+    Falls back to the first line, capped at 80 chars.
     """
-    match = re.match(r'(דקל בנו (?:שני|רביעי)\s+\d{1,2}[.\-/]\d{1,2}[.\-/]\d{2,4})', text)
+    match = re.match(r'(.{0,80}?\d{1,2}[.\-/]\d{1,2}[.\-/]\d{2,4})', text)
     if match:
         return match.group(1).strip()
-    # Fallback: take text up to first newline or non-title content
-    return text.split('\n')[0][:60].strip()
+    return text.split('\n')[0][:80].strip()
+
+
+def _day_of_week(title: str, published_at) -> str | None:
+    """
+    Return 'monday' or 'wednesday' (or None) for a post.
+    First checks for explicit day words in the title; falls back to
+    deriving the weekday from the parsed date.
+    """
+    if 'שני' in title:
+        return 'monday'
+    if 'רביעי' in title:
+        return 'wednesday'
+    if published_at:
+        # published_at is an ISO string; parse it back to a date
+        try:
+            dt = datetime.fromisoformat(published_at)
+            # Monday=0, Wednesday=2
+            if dt.weekday() == 0:
+                return 'monday'
+            if dt.weekday() == 2:
+                return 'wednesday'
+        except ValueError:
+            pass
+    return None
 
 
 def _parse_date(title: str):
