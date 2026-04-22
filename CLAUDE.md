@@ -59,11 +59,13 @@ npm start
 
 ## Image Format Expected
 
-- Light blue title bar at top (ignored)
-- Content area below: grid on RIGHT ~33%, clues on LEFT ~67%
-- Grid: clean black/white digital image, ~9×9 cells
+- Header bar(s) at top (ignored) — standard format has one light-blue bar; alternative format (e.g. ידיעות אחרונות) has a white/red title strip followed by a dark-blue subtitle bar
+- Content area below: grid on RIGHT ~38%, clues on LEFT ~62%
+- Grid: clean black/white digital image, ~9×9 cells (up to 20×20 supported)
 - Clues: RIGHT sub-column = מאוזן (across), LEFT sub-column = מאונך (down)
 - Clue format: `1. clue text (5);` — ends with letter count and semicolon
+
+`image_processor._find_title_bar_bottom` detects the bottom of the last contiguous blue region in the top 30% of the image, handling both light and dark blue headers. `grid_extractor` uses proportional Hough line clustering tolerance (2% of min dimension) and loops leading/trailing line removal to handle high-resolution images.
 
 ## Key Design Decisions
 

@@ -5,8 +5,8 @@
 Extend the app to automatically fetch new Hebrew crossword puzzles from a public Google Group instead of requiring manual image upload. Keep Stage 1 (manual upload) as a fallback.
 
 **Source:** https://groups.google.com/g/tartey_mashma
-**Puzzle posts:** titles starting with "דקל בנו שני" (Monday) or "דקל בנו רביעי" (Wednesday)
-**Attachment needed:** PNG only (each post also has a PDF)
+**Puzzle posts:** any post containing "דקל בנו", excluding "לאישה", posted on Monday or Wednesday
+**Attachment needed:** image file (JPG or PNG; each post also has a PDF)
 
 ---
 
@@ -209,6 +209,32 @@ App opens → ArchiveScreen (new default)
 - Supabase RLS: public SELECT on `puzzles`, service-key-only INSERT/UPDATE
 - End-to-end: trigger `/api/puzzles/sync` → puzzle appears in list → open it → solve cells → reload → progress restored
 - Stage 1 regression: upload a custom image → still processes correctly → lands in SolverScreen
+
+---
+
+## Post-Launch Fixes (2026-04-21)
+
+### Scraper: flexible title matching
+The scraper originally searched for the exact prefixes `"דקל בנו שני"` / `"דקל בנו רביעי"`. A puzzle uploaded as `"ידיעות אחרונות דקל בנו 20/4/26"` was missed.
+
+**Fix:** Search for the keyword `"דקל בנו"` and accept any post containing it, unless the title contains `"לאישה"` (a different puzzle series). Day-of-week is derived from `"שני"`/`"רביעי"` in the title, or by parsing the date and checking `weekday()`. Posts that resolve to neither Monday nor Wednesday are skipped.
+
+### Image processor: multi-band header detection
+The standard image format has a single light-blue title bar. The ידיעות אחרונות format has two stacked headers: a narrow dark-blue strip followed by a white/red title area and a second dark-blue subtitle bar.
+
+**Fix:** `_find_title_bar_bottom` now uses HSV value floor 50 (was 150) to catch dark-blue bars, and finds the **last blue row in the top 30%** of the image (not just the first contiguous band), so all stacked header bars are skipped in one pass.
+
+### Grid extractor: high-resolution image support
+High-res images (e.g. 4320×2072) have thick grid lines whose top and bottom edges are >8 px apart, causing each line to be double-counted. A narrow black artifact strip at the right edge of the grid region added an extra spurious column.
+
+**Fix:**
+- Hough line clustering tolerance is now `max(8, int(min_dim * 0.02))` — proportional to image size so thick lines in hi-res images cluster correctly.
+- `_regularize_lines` now **loops** leading and trailing interval removal (was a single `if`), so consecutive small-interval artifacts (image boundary + narrow strip) are fully pruned.
+
+### Frontend: sticky grid while scrolling clues
+The grid scrolled out of view when scrolling down the clue list.
+
+**Fix:** `.solver-grid-area` is now `position: sticky; top: 0` so it stays pinned to the top of the scroll container while the clue list scrolls beneath it.
 
 ---
 
