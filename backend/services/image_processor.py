@@ -4,11 +4,20 @@ from services.grid_extractor import extract_grid
 from services.clue_extractor import extract_clues
 
 
-def process_image(image_bytes: bytes) -> dict:
+def process_image(image_bytes: bytes, fmt: str = 'standard') -> dict:
     """
-    Orchestrate grid extraction (OpenCV) and clue extraction (Claude).
+    Orchestrate grid and clue extraction.
+    fmt: 'standard' (default) or 'tartei' (תרתי משמע Friday format).
     Returns: { grid: {...}, clues: { across: [...], down: [...] } }
     """
+    if fmt == 'tartei':
+        from services.tartei_processor import process_image_tartei
+        return process_image_tartei(image_bytes)
+    return _process_standard(image_bytes)
+
+
+def _process_standard(image_bytes: bytes) -> dict:
+    """Standard two-column crossword format."""
     nparr = np.frombuffer(image_bytes, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     if img is None:

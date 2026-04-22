@@ -18,6 +18,9 @@ IMAGE_EXTS = ('.jpg', '.jpeg', '.png')
 TITLE_KEYWORD = 'דקל בנו'
 TITLE_EXCLUDE = 'לאישה'
 
+# Friday format keywords
+TARTEI_KEYWORD = 'תרתי משמע'
+
 HEADERS = {
     'User-Agent': (
         'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) '
@@ -69,7 +72,7 @@ def fetch_new_puzzles() -> dict:
                 raise ValueError('No image attachment found in post')
 
             storage_path, public_url = _upload_image(db, image_bytes, post['post_id'])
-            processed_data = process_image(image_bytes)
+            processed_data = process_image(image_bytes, fmt=post.get('fmt', 'standard'))
             _insert_puzzle(db, post, storage_path, public_url, processed_data)
 
             new_count += 1
@@ -87,62 +90,82 @@ def fetch_new_puzzles() -> dict:
 
 def _search_posts() -> list[dict]:
     """
-    Search the Google Group for posts containing 'דקל בנו', excluding 'לאישה'.
+    Search the Google Group for:
+      - Mon/Wed posts: title contains 'דקל בנו' but not 'לאישה'
+      - Friday posts: title contains 'תרתי משמע'
     Returns a deduplicated list of post dicts keyed by thread ID.
     """
     posts = {}
 
-    url = f'{BASE}/g/{GROUP}/search?q={quote(TITLE_KEYWORD)}'
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=20)
-        r.raise_for_status()
-    except requests.RequestException as e:
-        logger.error(f'Search request failed for "{TITLE_KEYWORD}": {e}')
-        return []
+    # Two separate search queries: one for the regular puzzle, one for Friday format
+    search_queries = [
+        (TITLE_KEYWORD, 'standard'),
+        (TARTEI_KEYWORD, 'tartei'),
+    ]
 
-    soup = BeautifulSoup(r.text, 'lxml')
-
-    for a in soup.find_all('a', href=True):
-        href = a['href']
-        text = a.get_text(strip=True)
-
-        if '/c/' not in href or GROUP not in href:
+    for keyword, fmt in search_queries:
+        url = f'{BASE}/g/{GROUP}/search?q={quote(keyword)}'
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=20)
+            r.raise_for_status()
+        except requests.RequestException as e:
+            logger.error(f'Search request failed for "{keyword}": {e}')
             continue
 
-        # Must contain keyword; skip excluded titles
-        if TITLE_KEYWORD not in text or TITLE_EXCLUDE in text:
-            continue
+        soup = BeautifulSoup(r.text, 'lxml')
 
-        # Extract thread ID from ./g/tartey_mashma/c/{thread_id}/m/{msg_id}
-        match = re.search(r'/c/([^/]+)', href)
-        if not match:
-            continue
-        thread_id = match.group(1)
+        for a in soup.find_all('a', href=True):
+            href = a['href']
+            text = a.get_text(strip=True)
 
-        if thread_id in posts:
-            continue
+            if '/c/' not in href or GROUP not in href:
+                continue
 
-        # Normalize the post URL (strip leading ./ if relative)
-        if href.startswith('./'):
-            href = href[2:]
-        post_url = BASE + '/' + href.lstrip('/')
+            # Must contain the search keyword
+            if keyword not in text:
+                continue
 
-        title = _extract_title(text)
-        published_at = _parse_date(title)
-        day_of_week = _day_of_week(title, published_at)
+            # For the standard format, skip excluded titles
+            if fmt == 'standard' and TITLE_EXCLUDE in text:
+                continue
 
-        # Only keep puzzles posted on Monday or Wednesday
-        if day_of_week not in ('monday', 'wednesday'):
-            logger.debug(f'Skipping non-Monday/Wednesday post: {title}')
-            continue
+            # Extract thread ID from ./g/tartey_mashma/c/{thread_id}/m/{msg_id}
+            match = re.search(r'/c/([^/]+)', href)
+            if not match:
+                continue
+            thread_id = match.group(1)
 
-        posts[thread_id] = {
-            'post_id': thread_id,
-            'post_url': post_url,
-            'title': title,
-            'day_of_week': day_of_week,
-            'published_at': published_at,
-        }
+            if thread_id in posts:
+                continue
+
+            # Normalize the post URL (strip leading ./ if relative)
+            if href.startswith('./'):
+                href = href[2:]
+            post_url = BASE + '/' + href.lstrip('/')
+
+            title = _extract_title(text)
+            published_at = _parse_date(title)
+            day_of_week = _day_of_week(title, published_at)
+
+            if fmt == 'standard':
+                # Only keep Mon/Wed puzzles
+                if day_of_week not in ('monday', 'wednesday'):
+                    logger.debug(f'Skipping non-Monday/Wednesday post: {title}')
+                    continue
+            elif fmt == 'tartei':
+                # Only keep Friday puzzles
+                if day_of_week != 'friday':
+                    logger.debug(f'Skipping non-Friday תרתי משמע post: {title}')
+                    continue
+
+            posts[thread_id] = {
+                'post_id': thread_id,
+                'post_url': post_url,
+                'title': title,
+                'day_of_week': day_of_week,
+                'published_at': published_at,
+                'fmt': fmt,
+            }
 
     return list(posts.values())
 
@@ -169,15 +192,19 @@ def _day_of_week(title: str, published_at) -> str | None:
         return 'monday'
     if 'רביעי' in title:
         return 'wednesday'
+    if 'שישי' in title:
+        return 'friday'
     if published_at:
         # published_at is an ISO string; parse it back to a date
         try:
             dt = datetime.fromisoformat(published_at)
-            # Monday=0, Wednesday=2
+            # Monday=0, Wednesday=2, Friday=4
             if dt.weekday() == 0:
                 return 'monday'
             if dt.weekday() == 2:
                 return 'wednesday'
+            if dt.weekday() == 4:
+                return 'friday'
         except ValueError:
             pass
     return None
@@ -284,6 +311,7 @@ def _insert_puzzle(db, post: dict, storage_path: str, public_url: str, processed
         'title': post['title'],
         'published_at': post['published_at'],
         'day_of_week': post['day_of_week'],
+        'image_format': post.get('fmt', 'standard'),
         'image_storage_path': storage_path,
         'image_public_url': public_url,
         'processed_data': processed_data,
