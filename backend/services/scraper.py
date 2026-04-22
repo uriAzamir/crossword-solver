@@ -16,7 +16,7 @@ BASE = 'https://groups.google.com'
 GROUP = 'tartey_mashma'
 IMAGE_EXTS = ('.jpg', '.jpeg', '.png')
 TITLE_KEYWORD = 'דקל בנו'
-TITLE_EXCLUDE = 'לאישה'
+TITLE_EXCLUDES = ('לאישה', 'מקור ראשון')
 
 # Friday format keywords
 TARTEI_KEYWORD = 'תרתי משמע'
@@ -126,7 +126,7 @@ def _search_posts() -> list[dict]:
                 continue
 
             # For the standard format, skip excluded titles
-            if fmt == 'standard' and TITLE_EXCLUDE in text:
+            if fmt == 'standard' and any(ex in text for ex in TITLE_EXCLUDES):
                 continue
 
             # Extract thread ID from ./g/tartey_mashma/c/{thread_id}/m/{msg_id}
