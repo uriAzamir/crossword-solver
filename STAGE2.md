@@ -217,7 +217,7 @@ App opens → ArchiveScreen (new default)
 ### Scraper: flexible title matching
 The scraper originally searched for the exact prefixes `"דקל בנו שני"` / `"דקל בנו רביעי"`. A puzzle uploaded as `"ידיעות אחרונות דקל בנו 20/4/26"` was missed.
 
-**Fix:** Search for the keyword `"דקל בנו"` and accept any post containing it, unless the title contains `"לאישה"` (a different puzzle series). Day-of-week is derived from `"שני"`/`"רביעי"` in the title, or by parsing the date and checking `weekday()`. Posts that resolve to neither Monday nor Wednesday are skipped.
+**Fix:** Search for the keyword `"דקל בנו"` and accept any post containing it, unless the title contains `"לאישה"` or `"מקור ראשון"` (different puzzle series). Day-of-week is derived from `"שני"`/`"רביעי"` in the title, or by parsing the date and checking `weekday()`. Posts that resolve to neither Monday nor Wednesday are skipped.
 
 ### Image processor: multi-band header detection
 The standard image format has a single light-blue title bar. The ידיעות אחרונות format has two stacked headers: a narrow dark-blue strip followed by a white/red title area and a second dark-blue subtitle bar.
@@ -235,6 +235,38 @@ High-res images (e.g. 4320×2072) have thick grid lines whose top and bottom edg
 The grid scrolled out of view when scrolling down the clue list.
 
 **Fix:** `.solver-grid-area` is now `position: sticky; top: 0` so it stays pinned to the top of the scroll container while the clue list scrolls beneath it.
+
+---
+
+## Post-Launch Additions (2026-04-23)
+
+### תרתי משמע Friday crossword format
+
+A second puzzle series — "תרתי משמע" — is posted to the same Google Group every Friday. It has a completely different image layout from the standard Mon/Wed format:
+
+- **Header:** orange bar at the top (title only in left half)
+- **Grid:** always 11×11, occupies the left portion of the content area
+- **Yellow decorative bar** below the grid (marks the grid's bottom boundary)
+- **מאוזן clues:** to the right of the grid (single column)
+- **מאונך clues:** below the yellow bar across the full width (multiple columns)
+
+**New file: `backend/services/tartei_processor.py`**
+- `process_image_tartei(image_bytes)` — main entry point
+- `_detect_boundaries(img)` — locates `title_bottom` (last orange row in top 20%), `yellow_top` (first yellow row in left half below title), and `grid_right` (last orange column) using HSV color detection
+- Sends מאוזן and מאונך regions as separate images to Claude with a format-specific prompt
+
+**Changes to existing files:**
+- `image_processor.py`: `process_image()` now accepts `fmt='standard'` (default) or `fmt='tartei'` and routes accordingly
+- `scraper.py`: runs a second search query for `"תרתי משמע"`, accepts Friday posts, passes `fmt` through to `process_image()` and stores it as `image_format` in Supabase
+- `_day_of_week()` now handles `"שישי"` in title and `weekday() == 4`
+
+**Supabase schema change:** `ALTER TABLE puzzles ADD COLUMN image_format text DEFAULT 'standard';`
+
+### Scraper: filter out מקור ראשון puzzles
+
+Posts whose title contains `"מקור ראשון"` are a different puzzle series that share the `"דקל בנו"` keyword. These are now excluded alongside `"לאישה"`.
+
+**Fix:** `TITLE_EXCLUDE` replaced with `TITLE_EXCLUDES = ('לאישה', 'מקור ראשון')` tuple; filter checks `any(ex in text for ex in TITLE_EXCLUDES)`.
 
 ---
 
